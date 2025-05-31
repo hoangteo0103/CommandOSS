@@ -8,14 +8,13 @@ import { Notifications } from "@mantine/notifications";
 import { SuiClientProvider, WalletProvider } from "@mysten/dapp-kit";
 import { getFullnodeUrl } from "@mysten/sui/client";
 import { createNetworkConfig } from "@mysten/dapp-kit";
-
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 import "@mantine/dates/styles.css";
 import "./index.css";
+import "@mysten/dapp-kit/dist/index.css";
 import App from "./App.tsx";
 
-// Create a query client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -25,7 +24,7 @@ const queryClient = new QueryClient({
   },
 });
 
-// Configure Sui network
+// Configure Sui network.
 const { networkConfig } = createNetworkConfig({
   localnet: { url: getFullnodeUrl("localnet") },
   devnet: { url: getFullnodeUrl("devnet") },

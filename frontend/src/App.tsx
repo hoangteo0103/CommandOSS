@@ -6,6 +6,7 @@ import { WalletButton } from "./components/WalletButton";
 import { HomePage } from "./pages/HomePage";
 import { EventPage } from "./pages/EventPage";
 import { MyTicketsPage } from "./pages/MyTicketsPage";
+import { CreateEventPage } from "./pages/CreateEventPage";
 import { useWallet } from "./hooks/useWallet";
 
 function App() {
@@ -151,7 +152,7 @@ function App() {
         </Box>
       </AppShell.Header>
 
-      <AppShell.Main style={{ width: "100%", padding: "0" }}>
+      <AppShell.Main style={{ width: "100%", marginTop: "90px" }}>
         <style>
           {`
             @keyframes shimmer {
@@ -199,6 +200,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/events/:id" element={<EventPage />} />
           <Route path="/my-tickets" element={<MyTicketsPage />} />
+          <Route path="/admin/create-event" element={<CreateEventPage />} />
           <Route
             path="*"
             element={

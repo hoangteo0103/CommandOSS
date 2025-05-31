@@ -30,12 +30,13 @@ import { EventCard } from "../components/EventCard";
 import { WalletButton } from "../components/WalletButton";
 import { eventsApi } from "../services/api";
 import { useWallet } from "../hooks/useWallet";
+import { useNavigate } from "react-router-dom";
 
 export const HomePage = () => {
   const { isConnected } = useWallet();
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [showCreateForm, setShowCreateForm] = useState(false);
+  const navigate = useNavigate();
 
   const {
     data: eventsData,
@@ -141,7 +142,7 @@ export const HomePage = () => {
               {isConnected && (
                 <Button
                   leftSection={<IconPlus size={20} />}
-                  onClick={() => setShowCreateForm(true)}
+                  onClick={() => navigate("/admin/create-event")}
                   variant="outline"
                   size="xl"
                   radius="xl"

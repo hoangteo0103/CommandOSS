@@ -1,48 +1,103 @@
-import { Button, Group, Text, Badge } from "@mantine/core";
-import { IconWallet, IconCircleCheck } from "@tabler/icons-react";
-import { ConnectButton, useCurrentAccount } from "@mysten/dapp-kit";
+import { useState } from "react";
+import { Button, Group, Text, Menu, Box } from "@mantine/core";
+import {
+  IconWallet,
+  IconLogout,
+  IconUser,
+  IconExternalLink,
+} from "@tabler/icons-react";
+import {
+  useCurrentAccount,
+  ConnectButton,
+  useDisconnectWallet,
+} from "@mysten/dapp-kit";
+import { WalletConnectionModal } from "./WalletConnectionModal";
 
-interface WalletButtonProps {
-  fullWidth?: boolean;
-  variant?: string;
-}
+export const WalletButton = () => {
+  const currentAccount = useCurrentAccount();
+  const { mutate: disconnect } = useDisconnectWallet();
+  const [modalOpened, setModalOpened] = useState(false);
 
-export const WalletButton = ({
-  fullWidth = false,
-  variant = "filled",
-}: WalletButtonProps) => {
-  const account = useCurrentAccount();
+  const formatAddress = (address: string) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
 
-  if (account) {
+  // If wallet is connected, show account info with disconnect option
+  if (currentAccount) {
     return (
-      <ConnectButton connectText="Connect Wallet">
-        <Group gap="xs">
-          <Badge
-            leftSection={<IconCircleCheck size={12} />}
-            color="green"
+      <Menu shadow="md" width={200} position="bottom-end">
+        <Menu.Target>
+          <Button
             variant="light"
-            size="lg"
+            color="blue"
+            leftSection={<IconUser size={16} />}
+            size="md"
+            radius="xl"
+            style={{
+              background: "rgba(255, 255, 255, 0.95)",
+              border: "1px solid rgba(59, 130, 246, 0.2)",
+            }}
           >
-            <Text size="sm" fw={500}>
-              {account.address.slice(0, 6)}...{account.address.slice(-4)}
-            </Text>
-          </Badge>
-        </Group>
-      </ConnectButton>
+            {formatAddress(currentAccount.address)}
+          </Button>
+        </Menu.Target>
+
+        <Menu.Dropdown>
+          <Menu.Label>Wallet</Menu.Label>
+          <Menu.Item
+            component="a"
+            href={`https://explorer.sui.io/address/${currentAccount.address}?network=testnet`}
+            target="_blank"
+            leftSection={<IconExternalLink size={16} />}
+          >
+            View on Explorer
+          </Menu.Item>
+          <Menu.Divider />
+          <Menu.Item
+            color="red"
+            leftSection={<IconLogout size={16} />}
+            onClick={() => disconnect()}
+          >
+            Disconnect
+          </Menu.Item>
+        </Menu.Dropdown>
+      </Menu>
     );
   }
 
+  // If wallet is not connected, show connect options
   return (
-    <ConnectButton connectText="Connect Wallet">
-      <Button
-        fullWidth={fullWidth}
-        variant={variant}
-        leftSection={<IconWallet size={16} />}
-        gradient={{ from: "blue", to: "cyan", deg: 45 }}
-        size="md"
+    <Group gap="md">
+      {/* Direct Connect Button */}
+      <Box
+        style={{
+          background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+          padding: "4px",
+          borderRadius: "12px",
+        }}
       >
-        Connect Sui Wallet
+        <ConnectButton />
+      </Box>
+
+      <Button
+        leftSection={<IconWallet size={20} />}
+        onClick={() => setModalOpened(true)}
+        variant="light"
+        color="blue"
+        size="lg"
+        radius="xl"
+        style={{
+          fontWeight: 600,
+          padding: "16px 24px",
+        }}
+      >
+        Setup Guide
       </Button>
-    </ConnectButton>
+
+      <WalletConnectionModal
+        opened={modalOpened}
+        onClose={() => setModalOpened(false)}
+      />
+    </Group>
   );
 };

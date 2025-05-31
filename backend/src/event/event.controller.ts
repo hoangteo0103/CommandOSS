@@ -78,7 +78,6 @@ export class EventController {
     @Query('q') query?: string,
     @Query('limit') limit = 15,
     @Query('page') page = 1,
-    @Query('city') city?: string,
     @Query('categories') categories?: string,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
@@ -112,7 +111,6 @@ export class EventController {
       }
 
       const filters = {
-        city: city?.toLowerCase(),
         categories: parsedCategories,
         startDate,
         endDate,

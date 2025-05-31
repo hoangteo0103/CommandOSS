@@ -77,8 +77,9 @@ export class HybridSearchService {
         offset,
         with_payload: true,
       });
+
       // Convert scroll result to search result format
-      searchResult = searchResult[0].map((point) => ({
+      searchResult = searchResult.points.map((point) => ({
         id: point.id,
         score: 1.0, // No score for filter-only
         payload: point.payload,

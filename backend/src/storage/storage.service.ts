@@ -1,7 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { CreateStorageDto } from './dto/create-storage.dto';
-import { UpdateStorageDto } from './dto/update-storage.dto';
 import { createStorage, createStorageConfig } from '../config/storage.config';
 import { format } from 'date-fns';
 
@@ -14,13 +12,6 @@ export class StorageService {
   constructor(private configService: ConfigService) {
     this.config = createStorageConfig(this.configService);
     this.storage = createStorage(this.configService);
-
-    console.log('Storage config loaded:', {
-      projectId: this.config.projectId,
-      bucketName: this.config.bucketName,
-      keyFilename: this.config.keyFilename,
-    });
-
     if (!this.config.bucketName) {
       throw new Error('GCS_BUCKET_NAME environment variable is required');
     }
@@ -33,12 +24,6 @@ export class StorageService {
       if (!this.config.bucketName) {
         throw new BadRequestException('GCS bucket name not configured');
       }
-
-      console.log('Received file for upload:', {
-        originalname: file.originalname,
-        mimetype: file.mimetype,
-        size: file.size,
-      });
 
       // Generate a unique filename with timestamp.
       const timestamp = format(new Date(), 'yyyyMMdd-HHmmss');
@@ -65,8 +50,6 @@ export class StorageService {
             new BadRequestException(`Failed to upload file: ${error.message}`),
           );
         });
-
-        console.log('storage config', this.config);
 
         stream.on('finish', async () => {
           try {

@@ -185,20 +185,17 @@ export class EventController {
     }
 
     try {
-      const result = await this.hybridSearchService.searchByLocation(
+      const result = await this.eventService.searchEventsByLocation(
         lat,
         lng,
         radiusKm,
-        query,
-        {},
         limitNum,
-        1,
       );
 
       return {
         success: true,
-        data: result.events,
-        message: `Found ${result.events.length} events within ${radiusKm}km`,
+        data: result,
+        message: `Found ${result.length} events within ${radiusKm}km`,
       };
     } catch (error) {
       return {

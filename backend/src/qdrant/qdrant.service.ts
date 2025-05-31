@@ -162,7 +162,23 @@ export class QdrantService implements OnModuleInit {
         with_payload: true,
       });
 
-      return searchResult[0].map((point) =>
+      // Check if searchResult is valid and has points
+      if (
+        !searchResult ||
+        !Array.isArray(searchResult) ||
+        searchResult.length === 0
+      ) {
+        console.log('No search results returned from Qdrant scroll');
+        return [];
+      }
+
+      const points = searchResult[0];
+      if (!points || !Array.isArray(points)) {
+        console.log('Invalid points structure in Qdrant scroll result');
+        return [];
+      }
+
+      return points.map((point) =>
         this.convertPayloadToEvent(point.payload as any),
       );
     } catch (error) {
@@ -187,6 +203,12 @@ export class QdrantService implements OnModuleInit {
         with_payload: true,
         score_threshold: 0.3,
       });
+
+      // Check if searchResult is valid
+      if (!searchResult || !Array.isArray(searchResult)) {
+        console.log('No search results returned from Qdrant search');
+        return [];
+      }
 
       return searchResult.map((point) =>
         this.convertPayloadToEvent(point.payload as any),

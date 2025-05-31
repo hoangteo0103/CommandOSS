@@ -9,8 +9,32 @@ import {
   MaxLength,
   ArrayMaxSize,
   IsNumber,
-  IsDecimal,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class TicketTypeDto {
+  @IsString()
+  @IsNotEmpty()
+  id: string;
+
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @IsNumber()
+  price: number;
+
+  @IsNumber()
+  supply: number;
+
+  @IsNumber()
+  availableSupply: number;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+}
 
 export class CreateEventDto {
   @IsString()
@@ -63,6 +87,12 @@ export class CreateEventDto {
   @ArrayMaxSize(3)
   @IsString({ each: true })
   categories?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => TicketTypeDto)
+  ticketTypes?: TicketTypeDto[];
 
   @IsOptional()
   @IsString()

@@ -44,6 +44,16 @@ export class Event {
   @Column('simple-array', { nullable: true })
   categories: string[];
 
+  @Column({ type: 'json', nullable: true, name: 'ticket_types' })
+  ticketTypes: {
+    id: string;
+    name: string;
+    price: number;
+    supply: number;
+    availableSupply: number;
+    description?: string;
+  }[];
+
   @Column({ name: 'total_tickets', default: 0 })
   totalTickets: number;
 

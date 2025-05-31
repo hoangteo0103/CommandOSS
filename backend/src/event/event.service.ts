@@ -15,10 +15,20 @@ export class EventService {
   ) {}
 
   async create(createEventDto: CreateEventDto): Promise<Event> {
+    // Calculate total tickets from ticket types
+    const totalTickets =
+      createEventDto.ticketTypes?.reduce(
+        (sum, ticketType) => sum + ticketType.supply,
+        0,
+      ) || 0;
+
     const event = this.eventRepository.create({
       ...createEventDto,
       date: new Date(createEventDto.date),
       status: createEventDto.status || 'published',
+      ticketTypes: createEventDto.ticketTypes || [],
+      totalTickets,
+      availableTickets: totalTickets, // Initially all tickets are available
     });
 
     const savedEvent = await this.eventRepository.save(event);
@@ -158,8 +168,59 @@ export class EventService {
         limit,
       );
     } catch (error) {
-      console.error('Qdrant location search failed:', error);
-      throw error;
+      console.error(
+        'Qdrant location search failed, falling back to database search:',
+        error,
+      );
+
+      // Fallback to database search using JavaScript haversine calculation
+      const eventsWithLocation = await this.eventRepository
+        .createQueryBuilder('event')
+        .where('event.latitude IS NOT NULL AND event.longitude IS NOT NULL')
+        .getMany();
+
+      // Calculate distances in JavaScript
+      const eventsWithDistance = eventsWithLocation
+        .map((event) => {
+          const distance = this.calculateHaversineDistance(
+            latitude,
+            longitude,
+            parseFloat(event.latitude.toString()),
+            parseFloat(event.longitude.toString()),
+          );
+          return { event, distance };
+        })
+        .filter(({ distance }) => distance <= radiusKm)
+        .sort((a, b) => a.distance - b.distance)
+        .slice(0, limit);
+
+      console.log(
+        `Found ${eventsWithDistance.length} events within ${radiusKm}km using database fallback`,
+      );
+      return eventsWithDistance.map(({ event }) => event);
     }
+  }
+
+  private calculateHaversineDistance(
+    lat1: number,
+    lng1: number,
+    lat2: number,
+    lng2: number,
+  ): number {
+    const R = 6371; // Earth's radius in kilometers
+    const dLat = this.degreesToRadians(lat2 - lat1);
+    const dLng = this.degreesToRadians(lng2 - lng1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(this.degreesToRadians(lat1)) *
+        Math.cos(this.degreesToRadians(lat2)) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  private degreesToRadians(degrees: number): number {
+    return degrees * (Math.PI / 180);
   }
 }

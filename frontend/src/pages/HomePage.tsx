@@ -25,20 +25,11 @@ import {
   IconSearch,
   IconPlus,
   IconAlertCircle,
-  IconRocket,
-  IconDiamond,
   IconBolt,
   IconCalendar,
-  IconMapPin,
-  IconTicket,
   IconArrowRight,
   IconTrendingUp,
   IconSparkles,
-  IconUsers,
-  IconStar,
-  IconHeart,
-  IconShare,
-  IconEye,
 } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { EventCard } from "../components/EventCard";
@@ -251,7 +242,7 @@ export const HomePage = () => {
             </Text>
 
             <Group justify="center" gap="lg">
-              <WalletButton />
+              {/* <WalletButton /> */}
               {isConnected && (
                 <Button
                   leftSection={<IconPlus size={20} />}

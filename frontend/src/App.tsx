@@ -133,7 +133,7 @@ function App() {
                 Discover
               </Button>
 
-              <Button
+              {/* <Button
                 variant={
                   location.pathname === "/search" ? "gradient" : "subtle"
                 }
@@ -151,7 +151,7 @@ function App() {
                 }}
               >
                 Search
-              </Button>
+              </Button> */}
 
               {isConnected && (
                 <Button

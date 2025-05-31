@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Container,
   Title,
@@ -16,6 +17,9 @@ import {
   Flex,
   Badge,
   Card,
+  Image,
+  ActionIcon,
+  Chip,
 } from "@mantine/core";
 import {
   IconSearch,
@@ -24,18 +28,31 @@ import {
   IconRocket,
   IconDiamond,
   IconBolt,
+  IconCalendar,
+  IconMapPin,
+  IconTicket,
+  IconArrowRight,
+  IconTrendingUp,
+  IconSparkles,
+  IconUsers,
+  IconStar,
+  IconHeart,
+  IconShare,
+  IconEye,
 } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { EventCard } from "../components/EventCard";
 import { WalletButton } from "../components/WalletButton";
 import { eventsApi } from "../services/api";
 import { useWallet } from "../hooks/useWallet";
-import { useNavigate } from "react-router-dom";
+import type { Event } from "../types";
 
 export const HomePage = () => {
   const { isConnected } = useWallet();
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [featuredEvents, setFeaturedEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const {
@@ -57,6 +74,51 @@ export const HomePage = () => {
       event.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       event.location.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Popular categories for quick search
+  const popularCategories = [
+    { value: "Tech Conference", icon: "💻", color: "blue" },
+    { value: "Concert", icon: "🎵", color: "pink" },
+    { value: "Workshop", icon: "🛠️", color: "indigo" },
+    { value: "Sports", icon: "⚽", color: "red" },
+    { value: "Food & Drinks", icon: "🍕", color: "orange" },
+    { value: "Networking", icon: "🤝", color: "lime" },
+  ];
+
+  useEffect(() => {
+    const fetchFeaturedEvents = async () => {
+      try {
+        const response = await eventsApi.getEvents(1, 6);
+        if (response.data) {
+          setFeaturedEvents(response.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch featured events:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedEvents();
+  }, []);
+
+  // Handle search submission
+  const handleSearch = (query: string = searchQuery) => {
+    // Always include q parameter, even if empty, and use 'q' to match API
+    navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+  };
+
+  // Handle category search
+  const handleCategorySearch = (category: string) => {
+    navigate(`/search?q=&categories=${encodeURIComponent(category)}`);
+  };
+
+  // Handle key press for search
+  const handleKeyPress = (event: React.KeyboardEvent) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
+  };
 
   return (
     <Box
@@ -170,55 +232,144 @@ export const HomePage = () => {
           }}
         >
           <Stack gap="xl">
-            {/* Search Section */}
-            <Card
-              shadow="lg"
-              padding="xl"
-              radius="xl"
-              style={{
-                background: "rgba(255, 255, 255, 0.8)",
-                backdropFilter: "blur(20px)",
-                border: "1px solid rgba(59, 130, 246, 0.2)",
-              }}
-            >
-              <Group>
+            {/* Enhanced Search Section */}
+            <Stack gap="lg">
+              {/* Main Search Input */}
+              <Group gap="sm" align="stretch">
                 <TextInput
-                  placeholder="Search the metaverse for events..."
+                  placeholder="Search for events, organizers, or locations..."
                   leftSection={
                     <IconSearch
-                      size={24}
+                      size={20}
                       style={{
                         color: "#3b82f6",
                       }}
                     />
                   }
+                  rightSection={
+                    searchQuery ? (
+                      <ActionIcon
+                        variant="subtle"
+                        color="gray"
+                        onClick={() => setSearchQuery("")}
+                        size="sm"
+                      >
+                        ×
+                      </ActionIcon>
+                    ) : (
+                      <ActionIcon
+                        variant="filled"
+                        color="blue"
+                        onClick={() => handleSearch()}
+                        size="sm"
+                      >
+                        <IconArrowRight size={16} />
+                      </ActionIcon>
+                    )
+                  }
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.currentTarget.value)}
+                  onKeyDown={handleKeyPress}
                   style={{ flex: 1 }}
                   size="xl"
                   radius="xl"
                   styles={{
                     input: {
-                      border: "1px solid rgba(59, 130, 246, 0.2)",
-                      background: "rgba(255, 255, 255, 0.9)",
+                      border: "2px solid rgba(59, 130, 246, 0.2)",
+                      background: "rgba(255, 255, 255, 0.95)",
                       fontSize: "1.1rem",
-                      padding: "16px 20px",
+                      paddingLeft: "48px", // Proper space for icon
+                      paddingRight: "48px", // Space for right section
+                      height: "60px",
+                      "&:focus": {
+                        borderColor: "#3b82f6",
+                        boxShadow: "0 0 0 3px rgba(59, 130, 246, 0.1)",
+                      },
+                      "&::placeholder": {
+                        color: "#9ca3af",
+                        fontSize: "1rem",
+                      },
                     },
                   }}
                 />
-                {searchQuery && (
-                  <Button
-                    variant="light"
-                    onClick={() => setSearchQuery("")}
-                    radius="xl"
-                    color="blue"
-                    size="lg"
-                  >
-                    Clear
-                  </Button>
-                )}
+
+                <Button
+                  size="xl"
+                  radius="xl"
+                  onClick={() => handleSearch()}
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+                    border: "none",
+                    padding: "0 32px",
+                    height: "60px",
+                    fontWeight: 600,
+                  }}
+                >
+                  <IconSearch size={20} style={{ marginRight: "8px" }} />
+                  Search
+                </Button>
               </Group>
-            </Card>
+
+              {/* Quick Search Categories */}
+              <Box>
+                <Group justify="center" mb="sm">
+                  <IconSparkles size={16} style={{ color: "#6b7280" }} />
+                  <Text size="sm" c="dimmed" fw={500}>
+                    Popular Categories
+                  </Text>
+                </Group>
+
+                <Group justify="center" gap="xs">
+                  {popularCategories.map((category, index) => (
+                    <Chip
+                      key={index}
+                      variant="light"
+                      color={category.color}
+                      size="sm"
+                      radius="xl"
+                      onClick={() => handleCategorySearch(category.value)}
+                      style={{
+                        cursor: "pointer",
+                        transition: "all 0.2s ease",
+                        "&:hover": {
+                          transform: "translateY(-2px)",
+                          boxShadow: "0 4px 12px rgba(59, 130, 246, 0.2)",
+                        },
+                      }}
+                    >
+                      <span style={{ marginRight: "6px" }}>
+                        {category.icon}
+                      </span>
+                      {category.value}
+                    </Chip>
+                  ))}
+                </Group>
+              </Box>
+
+              {/* Quick Actions */}
+              <Group justify="center" gap="md">
+                <Button
+                  variant="light"
+                  color="blue"
+                  radius="xl"
+                  leftSection={<IconTrendingUp size={18} />}
+                  onClick={() => navigate("/search")}
+                >
+                  Browse All Events
+                </Button>
+
+                <Button
+                  variant="light"
+                  color="green"
+                  radius="xl"
+                  leftSection={<IconCalendar size={18} />}
+                  onClick={() => navigate("/create-event")}
+                >
+                  Create Event
+                </Button>
+              </Group>
+            </Stack>
 
             {/* Content */}
             {isLoading ? (

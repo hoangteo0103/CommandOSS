@@ -158,10 +158,10 @@ export const EventDetailsStep: React.FC<EventDetailsStepProps> = ({
   };
 
   const handlePlaceSelect = (place: PlaceDetails) => {
-    form.setFieldValue("location", place.formattedAddress);
-    form.setFieldValue("latitude", place.latitude);
-    form.setFieldValue("longitude", place.longitude);
-    form.setFieldValue("placeId", place.placeId);
+    form.values.location = place.name + ", " + place.formattedAddress;
+    form.values.latitude = place.latitude;
+    form.values.longitude = place.longitude;
+    form.values.placeId = place.placeId;
   };
 
   return (

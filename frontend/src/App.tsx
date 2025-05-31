@@ -1,6 +1,11 @@
 import { Routes, Route } from "react-router-dom";
 import { AppShell, Group, Title, Button, Text, Box, Flex } from "@mantine/core";
-import { IconHome, IconWallet, IconHexagon3d } from "@tabler/icons-react";
+import {
+  IconHome,
+  IconWallet,
+  IconHexagon3d,
+  IconSearch,
+} from "@tabler/icons-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { WalletButton } from "./components/WalletButton";
 import { HomePage } from "./pages/HomePage";
@@ -10,6 +15,7 @@ import { CreateEventPage } from "./pages/CreateEventPage";
 import { EditEventPage } from "./pages/EditEventPage";
 import { CheckInPage } from "./pages/CheckInPage";
 import { TicketPurchasePage } from "./pages/TicketPurchasePage";
+import { SearchPage } from "./pages/SearchPage";
 import { useWallet } from "./hooks/useWallet";
 
 function App() {
@@ -127,6 +133,26 @@ function App() {
                 Discover
               </Button>
 
+              <Button
+                variant={
+                  location.pathname === "/search" ? "gradient" : "subtle"
+                }
+                gradient={{ from: "cyan", to: "teal", deg: 45 }}
+                leftSection={<IconSearch size={16} />}
+                onClick={() => navigate("/search")}
+                size="md"
+                radius="xl"
+                style={{
+                  transition: "all 0.3s ease",
+                  ...(location.pathname !== "/search" && {
+                    backgroundColor: "rgba(6, 182, 212, 0.1)",
+                    border: "1px solid rgba(6, 182, 212, 0.2)",
+                  }),
+                }}
+              >
+                Search
+              </Button>
+
               {isConnected && (
                 <Button
                   variant={
@@ -231,6 +257,7 @@ function App() {
 
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/search" element={<SearchPage />} />
           <Route path="/events/:id" element={<EventPage />} />
           <Route path="/events/:eventId/edit" element={<EditEventPage />} />
           <Route path="/events/:eventId/check-in" element={<CheckInPage />} />

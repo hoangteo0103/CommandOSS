@@ -93,6 +93,52 @@ export const eventsApi = {
     return response.data;
   },
 
+  // Semantic search for events
+  searchEvents: async (params: {
+    query?: string;
+    limit?: number;
+    page?: number;
+    categories?: string[];
+    startDate?: string;
+    endDate?: string;
+    status?: string;
+    organizerName?: string;
+    minLat?: number;
+    maxLat?: number;
+    minLon?: number;
+    maxLon?: number;
+  }): Promise<{
+    success: boolean;
+    result: Event[];
+    page: number;
+    limit: number;
+    total: number;
+    message: string;
+  }> => {
+    const searchParams = new URLSearchParams();
+
+    if (params.query) searchParams.set("q", params.query);
+    if (params.limit) searchParams.set("limit", params.limit.toString());
+    if (params.page) searchParams.set("page", params.page.toString());
+    if (params.categories && params.categories.length > 0) {
+      searchParams.set("categories", params.categories.join(","));
+    }
+    if (params.startDate) searchParams.set("startDate", params.startDate);
+    if (params.endDate) searchParams.set("endDate", params.endDate);
+    if (params.status) searchParams.set("status", params.status);
+    if (params.organizerName)
+      searchParams.set("organizerName", params.organizerName);
+    if (params.minLat) searchParams.set("minLat", params.minLat.toString());
+    if (params.maxLat) searchParams.set("maxLat", params.maxLat.toString());
+    if (params.minLon) searchParams.set("minLon", params.minLon.toString());
+    if (params.maxLon) searchParams.set("maxLon", params.maxLon.toString());
+
+    const response = await api.get(
+      `/events/search/semantic?${searchParams.toString()}`
+    );
+    return response.data;
+  },
+
   // Create new event
   createEvent: async (
     data: CreateEventRequest

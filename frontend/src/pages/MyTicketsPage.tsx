@@ -58,6 +58,7 @@ import {
   IconShieldCheck,
   IconCopy,
   IconFingerprint,
+  IconCoin,
 } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { TicketList } from "../components/TicketList";
@@ -127,7 +128,7 @@ export const MyTicketsPage = () => {
   ).length;
   const usedCount = tickets.filter((t) => t.isUsed).length;
   const totalValue = tickets.reduce(
-    (sum, ticket) => sum + (ticket.ticketType?.price || 0),
+    (sum, ticket) => sum + (ticket?.price || 0),
     0
   );
 
@@ -841,7 +842,6 @@ const TicketCard = ({ ticket, onView, onShare, index }: any) => {
   const isUpcoming = ticket.event && new Date(ticket.event.date) > new Date();
   const isPast = ticket.event && new Date(ticket.event.date) <= new Date();
   const [miniQrCode, setMiniQrCode] = useState<string>("");
-
   useEffect(() => {
     const generateMiniQr = async () => {
       try {
@@ -979,13 +979,16 @@ const TicketCard = ({ ticket, onView, onShare, index }: any) => {
               </Group>
 
               <Group justify="space-between" align="center">
-                <Text
-                  size="xl"
-                  fw={900}
-                  style={{ textShadow: "0 2px 4px rgba(0,0,0,0.3)" }}
-                >
-                  ${ticket.ticketType?.price || 0}
-                </Text>
+                <Group gap="xs">
+                  <IconCoin size={20} style={{ opacity: 0.9 }} />
+                  <Text
+                    size="xl"
+                    fw={900}
+                    style={{ textShadow: "0 2px 4px rgba(0,0,0,0.3)" }}
+                  >
+                    SUI {ticket?.price || 0}
+                  </Text>
+                </Group>
 
                 {/* Mini QR Code Preview */}
                 {miniQrCode && (

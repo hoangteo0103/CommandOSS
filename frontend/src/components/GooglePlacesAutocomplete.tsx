@@ -78,7 +78,7 @@ export const GooglePlacesAutocomplete: React.FC<
                 addressComponents: place.address_components || [],
               };
 
-              setInputValue(place.name || place.formatted_address || "");
+              setInputValue(place.name + ", " + place.formatted_address || "");
               onPlaceSelect(placeDetails);
             }
           });

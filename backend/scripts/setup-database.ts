@@ -11,6 +11,7 @@ const AppDataSource = new DataSource({
   username: process.env.DATABASE_USERNAME || 'postgres',
   password: process.env.DATABASE_PASSWORD || 'password',
   database: process.env.DATABASE_NAME || 'eventify',
+  ssl: true,
   entities: ['src/**/*.entity.ts'],
   migrations: ['src/migrations/*.ts'],
   migrationsTableName: 'migrations',

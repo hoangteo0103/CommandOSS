@@ -12,8 +12,11 @@ async function bootstrap() {
   // Global validation pipe.
   app.useGlobalPipes(new ValidationPipe());
 
-  await app.listen(process.env.PORT ?? 3000);
-  console.log('🚀 Server is running on http://localhost:3000');
+  // Use PORT environment variable for Cloud Run compatibility
+  const port = process.env.PORT || 8080;
+  await app.listen(port, '0.0.0.0');
+
+  console.log(`🚀 Server is running on port ${port}`);
   console.log('📁 Using Google Cloud Storage for file uploads');
 }
 bootstrap();

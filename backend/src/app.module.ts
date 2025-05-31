@@ -27,6 +27,7 @@ import { TicketsModule } from './tickets/tickets.module';
         database: configService.get('DATABASE_NAME'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: configService.get('DATABASE_SYNCHRONIZE') === 'true',
+        ssl: true,
       }),
       inject: [ConfigService],
     }),

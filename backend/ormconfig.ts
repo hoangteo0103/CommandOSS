@@ -11,6 +11,7 @@ export const AppDataSource = new DataSource({
   username: process.env.DATABASE_USERNAME || 'postgres',
   password: process.env.DATABASE_PASSWORD || 'postgres',
   database: process.env.DATABASE_NAME || 'eventify',
+  ssl: true,
 
   // Use TypeScript files for development, JavaScript for production
   entities:

@@ -20,6 +20,15 @@ export class Event {
   @Column()
   location: string;
 
+  @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
+  latitude: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
+  longitude: number;
+
+  @Column({ name: 'place_id', nullable: true })
+  placeId: string;
+
   @Column({ name: 'organizer_name' })
   organizerName: string;
 

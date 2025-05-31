@@ -4,12 +4,14 @@ import { Repository, MoreThanOrEqual } from 'typeorm';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { Event } from './entities/event.entity';
+import { QdrantService } from '../qdrant/qdrant.service';
 
 @Injectable()
 export class EventService {
   constructor(
     @InjectRepository(Event)
     private readonly eventRepository: Repository<Event>,
+    private readonly qdrantService: QdrantService,
   ) {}
 
   async create(createEventDto: CreateEventDto): Promise<Event> {
@@ -19,7 +21,17 @@ export class EventService {
       status: createEventDto.status || 'published',
     });
 
-    return await this.eventRepository.save(event);
+    const savedEvent = await this.eventRepository.save(event);
+
+    // Index to Qdrant for search
+    try {
+      await this.qdrantService.indexEvent(savedEvent);
+    } catch (error) {
+      console.error('Failed to index event to Qdrant:', error);
+      // Don't fail the main operation if indexing fails
+    }
+
+    return savedEvent;
   }
 
   async findAll(
@@ -68,11 +80,28 @@ export class EventService {
     };
 
     Object.assign(event, updateData);
-    return await this.eventRepository.save(event);
+    const updatedEvent = await this.eventRepository.save(event);
+
+    // Update index in Qdrant
+    try {
+      await this.qdrantService.indexEvent(updatedEvent);
+    } catch (error) {
+      console.error('Failed to update event in Qdrant:', error);
+    }
+
+    return updatedEvent;
   }
 
   async remove(id: string): Promise<void> {
     const event = await this.findOne(id);
+
+    // Remove from Qdrant first
+    try {
+      await this.qdrantService.deleteEvent(id);
+    } catch (error) {
+      console.error('Failed to delete event from Qdrant:', error);
+    }
+
     await this.eventRepository.remove(event);
   }
 
@@ -95,12 +124,42 @@ export class EventService {
   }
 
   async searchEvents(query: string): Promise<Event[]> {
-    return await this.eventRepository
-      .createQueryBuilder('event')
-      .where('event.name ILIKE :query OR event.description ILIKE :query', {
-        query: `%${query}%`,
-      })
-      .orderBy('event.createdAt', 'DESC')
-      .getMany();
+    // Try Qdrant search first for better results
+    try {
+      return await this.qdrantService.searchEventsByContent(query);
+    } catch (error) {
+      console.error(
+        'Qdrant search failed, falling back to database search:',
+        error,
+      );
+
+      // Fallback to database search
+      return await this.eventRepository
+        .createQueryBuilder('event')
+        .where('event.name ILIKE :query OR event.description ILIKE :query', {
+          query: `%${query}%`,
+        })
+        .orderBy('event.createdAt', 'DESC')
+        .getMany();
+    }
+  }
+
+  async searchEventsByLocation(
+    latitude: number,
+    longitude: number,
+    radiusKm: number = 10,
+    limit: number = 20,
+  ): Promise<Event[]> {
+    try {
+      return await this.qdrantService.searchEventsByLocation(
+        latitude,
+        longitude,
+        radiusKm,
+        limit,
+      );
+    } catch (error) {
+      console.error('Qdrant location search failed:', error);
+      throw error;
+    }
   }
 }

@@ -8,6 +8,8 @@ import {
   MinLength,
   MaxLength,
   ArrayMaxSize,
+  IsNumber,
+  IsDecimal,
 } from 'class-validator';
 
 export class CreateEventDto {
@@ -26,6 +28,18 @@ export class CreateEventDto {
   @IsNotEmpty()
   @MinLength(3, { message: 'Location is required' })
   location: string;
+
+  @IsOptional()
+  @IsNumber()
+  latitude?: number;
+
+  @IsOptional()
+  @IsNumber()
+  longitude?: number;
+
+  @IsOptional()
+  @IsString()
+  placeId?: string;
 
   @IsString()
   @IsNotEmpty()

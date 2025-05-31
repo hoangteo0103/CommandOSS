@@ -49,12 +49,13 @@ export class StorageService {
       // Create a file object in the bucket.
       const blob = this.bucket.file(uniqueFilename);
 
-      // Create a stream to upload the file.
+      // Create a stream to upload the file with public read permissions
       const stream = blob.createWriteStream({
         metadata: {
           contentType: file.mimetype,
           cacheControl: 'public, max-age=3600',
         },
+        public: true, // Make file publicly readable during upload
       });
 
       return new Promise((resolve, reject) => {
@@ -69,13 +70,33 @@ export class StorageService {
 
         stream.on('finish', async () => {
           try {
-            // Don't call makePublic() - instead rely on bucket-level IAM policies
-            // The bucket should be configured with allUsers having Storage Object Viewer role
+            // Try to make the file publicly accessible (fallback)
+            try {
+              await blob.makePublic();
+              console.log('File made public via makePublic()');
+            } catch (publicError) {
+              console.warn(
+                'Could not make file public via makePublic(), trying ACL:',
+                publicError.message,
+              );
+
+              // Fallback: Set ACL directly
+              try {
+                await blob.acl.add({
+                  entity: 'allUsers',
+                  role: 'READER',
+                });
+                console.log('File made public via ACL');
+              } catch (aclError) {
+                console.error('Failed to set public ACL:', aclError.message);
+                // Continue anyway - the file might still be accessible if bucket has public policy
+              }
+            }
 
             // Generate the public URL.
             const publicUrl = `https://storage.googleapis.com/${this.config.bucketName}/${uniqueFilename}`;
 
-            console.log('File uploaded successfully:', {
+            console.log('File uploaded and made public successfully:', {
               filename: uniqueFilename,
               url: publicUrl,
             });

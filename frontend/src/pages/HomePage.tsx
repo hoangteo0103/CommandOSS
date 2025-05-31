@@ -491,16 +491,6 @@ export const HomePage = () => {
                       All tickets are minted as NFTs on Sui blockchain
                     </Text>
                   </Box>
-
-                  <Badge
-                    leftSection={<IconDiamond size={16} />}
-                    variant="gradient"
-                    gradient={{ from: "blue", to: "cyan", deg: 45 }}
-                    size="xl"
-                    style={{ padding: "12px 20px" }}
-                  >
-                    NFT GUARANTEED
-                  </Badge>
                 </Flex>
 
                 {/* Events Grid - Full Width */}

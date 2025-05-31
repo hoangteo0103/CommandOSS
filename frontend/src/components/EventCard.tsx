@@ -152,10 +152,6 @@ export const EventCard = ({ event }: EventCardProps) => {
           </Text>
         </Group>
 
-        <Text size="sm" c="dimmed" lineClamp={2} opacity={0.8}>
-          {event.description}
-        </Text>
-
         {/* Categories */}
         {event.categories && event.categories.length > 0 && (
           <Group gap="xs">

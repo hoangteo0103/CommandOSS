@@ -92,7 +92,15 @@ export const HomePage = () => {
           }}
         />
 
-        <Container size="xl" style={{ position: "relative", zIndex: 1 }}>
+        <Box
+          style={{
+            position: "relative",
+            zIndex: 1,
+            maxWidth: "1400px",
+            margin: "0 auto",
+            width: "100%",
+          }}
+        >
           <Stack gap="xl">
             <Badge
               size="xl"
@@ -148,226 +156,241 @@ export const HomePage = () => {
               )}
             </Group>
           </Stack>
-        </Container>
+        </Box>
       </Box>
 
-      {/* Main Content */}
-      <Container size="xl" py="xl">
-        <Stack gap="xl">
-          {/* Search Section */}
-          <Card
-            shadow="lg"
-            padding="xl"
-            radius="xl"
-            style={{
-              background: "rgba(255, 255, 255, 0.8)",
-              backdropFilter: "blur(20px)",
-              border: "1px solid rgba(59, 130, 246, 0.2)",
-            }}
-          >
-            <Group>
-              <TextInput
-                placeholder="Search the metaverse for events..."
-                leftSection={
-                  <IconSearch
-                    size={24}
-                    style={{
-                      color: "#3b82f6",
-                    }}
-                  />
-                }
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.currentTarget.value)}
-                style={{ flex: 1 }}
-                size="xl"
-                radius="xl"
-                styles={{
-                  input: {
-                    border: "1px solid rgba(59, 130, 246, 0.2)",
-                    background: "rgba(255, 255, 255, 0.9)",
-                    fontSize: "1.1rem",
-                    padding: "16px 20px",
-                  },
-                }}
-              />
-              {searchQuery && (
-                <Button
-                  variant="light"
-                  onClick={() => setSearchQuery("")}
-                  radius="xl"
-                  color="blue"
-                  size="lg"
-                >
-                  Clear
-                </Button>
-              )}
-            </Group>
-          </Card>
-
-          {/* Content */}
-          {isLoading ? (
-            <Center py="xl">
-              <Stack align="center" gap="md">
-                <Box
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)",
-                    borderRadius: "50%",
-                    padding: "30px",
-                    animation: "pulse 2s infinite",
-                  }}
-                >
-                  <Loader size="xl" color="white" />
-                </Box>
-                <Text size="xl" fw={500}>
-                  Scanning the blockchain for events...
-                </Text>
-              </Stack>
-            </Center>
-          ) : error ? (
-            <Alert
-              icon={<IconAlertCircle size={20} />}
-              color="red"
+      {/* Main Content - Full Width */}
+      <Box style={{ padding: "3rem 2rem", width: "100%" }}>
+        <Box
+          style={{
+            maxWidth: "1400px",
+            margin: "0 auto",
+            width: "100%",
+          }}
+        >
+          <Stack gap="xl">
+            {/* Search Section */}
+            <Card
+              shadow="lg"
+              padding="xl"
               radius="xl"
               style={{
-                background: "rgba(239, 68, 68, 0.1)",
-                border: "1px solid rgba(239, 68, 68, 0.2)",
-                padding: "20px",
-                fontSize: "1.1rem",
+                background: "rgba(255, 255, 255, 0.8)",
+                backdropFilter: "blur(20px)",
+                border: "1px solid rgba(59, 130, 246, 0.2)",
               }}
             >
-              Failed to load events from the blockchain. Please try again later.
-            </Alert>
-          ) : filteredEvents.length === 0 ? (
-            <Center py="xl">
-              <Card
-                shadow="lg"
-                padding="xl"
-                radius="xl"
-                style={{
-                  background:
-                    "linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)",
-                  border: "1px solid rgba(59, 130, 246, 0.1)",
-                  textAlign: "center",
-                  maxWidth: "600px",
-                  width: "100%",
-                }}
-              >
-                <Stack align="center" gap="lg">
+              <Group>
+                <TextInput
+                  placeholder="Search the metaverse for events..."
+                  leftSection={
+                    <IconSearch
+                      size={24}
+                      style={{
+                        color: "#3b82f6",
+                      }}
+                    />
+                  }
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.currentTarget.value)}
+                  style={{ flex: 1 }}
+                  size="xl"
+                  radius="xl"
+                  styles={{
+                    input: {
+                      border: "1px solid rgba(59, 130, 246, 0.2)",
+                      background: "rgba(255, 255, 255, 0.9)",
+                      fontSize: "1.1rem",
+                      padding: "16px 20px",
+                    },
+                  }}
+                />
+                {searchQuery && (
+                  <Button
+                    variant="light"
+                    onClick={() => setSearchQuery("")}
+                    radius="xl"
+                    color="blue"
+                    size="lg"
+                  >
+                    Clear
+                  </Button>
+                )}
+              </Group>
+            </Card>
+
+            {/* Content */}
+            {isLoading ? (
+              <Center py="xl">
+                <Stack align="center" gap="md">
                   <Box
                     style={{
                       background:
-                        "linear-gradient(135deg, #64748b 0%, #94a3b8 100%)",
+                        "linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)",
                       borderRadius: "50%",
-                      padding: "32px",
+                      padding: "30px",
+                      animation: "pulse 2s infinite",
                     }}
                   >
-                    <IconSearch size={64} color="white" />
+                    <Loader size="xl" color="white" />
                   </Box>
-                  <Title order={2} fw={700}>
-                    No Events Found
-                  </Title>
-                  <Text c="dimmed" size="lg">
-                    {searchQuery
-                      ? "Try adjusting your search terms or explore all events"
-                      : "No events are currently live in the metaverse. Check back soon for exciting experiences!"}
+                  <Text size="xl" fw={500}>
+                    Scanning the blockchain for events...
                   </Text>
-                  {searchQuery && (
-                    <Button
-                      variant="gradient"
-                      gradient={{ from: "blue", to: "cyan", deg: 45 }}
-                      onClick={() => setSearchQuery("")}
-                      radius="xl"
-                      size="xl"
-                    >
-                      Explore All Events
-                    </Button>
-                  )}
                 </Stack>
-              </Card>
-            </Center>
-          ) : (
-            <>
-              {/* Results Header */}
-              <Flex justify="space-between" align="center" wrap="wrap" gap="md">
-                <Box>
-                  <Text size="xl" fw={600}>
-                    {searchQuery ? (
-                      <>
-                        <Text span c="blue" fw={700}>
-                          {filteredEvents.length}
-                        </Text>{" "}
-                        event{filteredEvents.length !== 1 ? "s" : ""} found for
-                        <Text span c="blue" fw={700}>
-                          {" "}
-                          "{searchQuery}"
-                        </Text>
-                      </>
-                    ) : (
-                      <>
-                        Showing{" "}
-                        <Text span c="blue" fw={700}>
-                          {events.length}
-                        </Text>{" "}
-                        live event{events.length !== 1 ? "s" : ""}
-                      </>
-                    )}
-                  </Text>
-                  <Text size="md" c="dimmed">
-                    All tickets are minted as NFTs on Sui blockchain
-                  </Text>
-                </Box>
-
-                <Badge
-                  leftSection={<IconDiamond size={16} />}
-                  variant="gradient"
-                  gradient={{ from: "blue", to: "cyan", deg: 45 }}
-                  size="xl"
-                  style={{ padding: "12px 20px" }}
+              </Center>
+            ) : error ? (
+              <Alert
+                icon={<IconAlertCircle size={20} />}
+                color="red"
+                radius="xl"
+                style={{
+                  background: "rgba(239, 68, 68, 0.1)",
+                  border: "1px solid rgba(239, 68, 68, 0.2)",
+                  padding: "20px",
+                  fontSize: "1.1rem",
+                }}
+              >
+                Failed to load events from the blockchain. Please try again
+                later.
+              </Alert>
+            ) : filteredEvents.length === 0 ? (
+              <Center py="xl">
+                <Card
+                  shadow="lg"
+                  padding="xl"
+                  radius="xl"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)",
+                    border: "1px solid rgba(59, 130, 246, 0.1)",
+                    textAlign: "center",
+                    maxWidth: "600px",
+                    width: "100%",
+                  }}
                 >
-                  NFT GUARANTEED
-                </Badge>
-              </Flex>
+                  <Stack align="center" gap="lg">
+                    <Box
+                      style={{
+                        background:
+                          "linear-gradient(135deg, #64748b 0%, #94a3b8 100%)",
+                        borderRadius: "50%",
+                        padding: "32px",
+                      }}
+                    >
+                      <IconSearch size={64} color="white" />
+                    </Box>
+                    <Title order={2} fw={700}>
+                      No Events Found
+                    </Title>
+                    <Text c="dimmed" size="lg">
+                      {searchQuery
+                        ? "Try adjusting your search terms or explore all events"
+                        : "No events are currently live in the metaverse. Check back soon for exciting experiences!"}
+                    </Text>
+                    {searchQuery && (
+                      <Button
+                        variant="gradient"
+                        gradient={{ from: "blue", to: "cyan", deg: 45 }}
+                        onClick={() => setSearchQuery("")}
+                        radius="xl"
+                        size="xl"
+                      >
+                        Explore All Events
+                      </Button>
+                    )}
+                  </Stack>
+                </Card>
+              </Center>
+            ) : (
+              <>
+                {/* Results Header */}
+                <Flex
+                  justify="space-between"
+                  align="center"
+                  wrap="wrap"
+                  gap="md"
+                >
+                  <Box>
+                    <Text size="xl" fw={600}>
+                      {searchQuery ? (
+                        <>
+                          <Text span c="blue" fw={700}>
+                            {filteredEvents.length}
+                          </Text>{" "}
+                          event{filteredEvents.length !== 1 ? "s" : ""} found
+                          for
+                          <Text span c="blue" fw={700}>
+                            {" "}
+                            "{searchQuery}"
+                          </Text>
+                        </>
+                      ) : (
+                        <>
+                          Showing{" "}
+                          <Text span c="blue" fw={700}>
+                            {events.length}
+                          </Text>{" "}
+                          live event{events.length !== 1 ? "s" : ""}
+                        </>
+                      )}
+                    </Text>
+                    <Text size="md" c="dimmed">
+                      All tickets are minted as NFTs on Sui blockchain
+                    </Text>
+                  </Box>
 
-              {/* Events Grid - Full Width */}
-              <Grid gutter="xl">
-                {filteredEvents.map((event) => (
-                  <Grid.Col
-                    key={event.id}
-                    span={{ base: 12, sm: 6, md: 4, xl: 3 }}
-                  >
-                    <EventCard event={event} />
-                  </Grid.Col>
-                ))}
-              </Grid>
-
-              {/* Pagination */}
-              {!searchQuery && totalPages > 1 && (
-                <Center pt="xl">
-                  <Pagination
-                    total={totalPages}
-                    value={currentPage}
-                    onChange={setCurrentPage}
+                  <Badge
+                    leftSection={<IconDiamond size={16} />}
+                    variant="gradient"
+                    gradient={{ from: "blue", to: "cyan", deg: 45 }}
                     size="xl"
-                    radius="xl"
-                    styles={{
-                      control: {
-                        border: "1px solid rgba(59, 130, 246, 0.2)",
-                        padding: "12px 16px",
-                        "&[data-active]": {
-                          background:
-                            "linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)",
-                          border: "none",
+                    style={{ padding: "12px 20px" }}
+                  >
+                    NFT GUARANTEED
+                  </Badge>
+                </Flex>
+
+                {/* Events Grid - Full Width */}
+                <Grid gutter="xl">
+                  {filteredEvents.map((event) => (
+                    <Grid.Col
+                      key={event.id}
+                      span={{ base: 12, sm: 6, md: 4, xl: 3 }}
+                    >
+                      <EventCard event={event} />
+                    </Grid.Col>
+                  ))}
+                </Grid>
+
+                {/* Pagination */}
+                {!searchQuery && totalPages > 1 && (
+                  <Center pt="xl">
+                    <Pagination
+                      total={totalPages}
+                      value={currentPage}
+                      onChange={setCurrentPage}
+                      size="xl"
+                      radius="xl"
+                      styles={{
+                        control: {
+                          border: "1px solid rgba(59, 130, 246, 0.2)",
+                          padding: "12px 16px",
+                          "&[data-active]": {
+                            background:
+                              "linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)",
+                            border: "none",
+                          },
                         },
-                      },
-                    }}
-                  />
-                </Center>
-              )}
-            </>
-          )}
-        </Stack>
-      </Container>
+                      }}
+                    />
+                  </Center>
+                )}
+              </>
+            )}
+          </Stack>
+        </Box>
+      </Box>
 
       {/* Stats Section - Full Width Background */}
       {!isLoading && !error && events.length > 0 && (
@@ -375,11 +398,18 @@ export const HomePage = () => {
           style={{
             background:
               "linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)",
-            padding: "4rem 0",
-            marginTop: "4rem",
+            padding: "4rem 2rem",
+            marginTop: "2rem",
+            width: "100%",
           }}
         >
-          <Container size="xl">
+          <Box
+            style={{
+              maxWidth: "1400px",
+              margin: "0 auto",
+              width: "100%",
+            }}
+          >
             <Card
               shadow="xl"
               padding="3rem"
@@ -501,7 +531,7 @@ export const HomePage = () => {
                 </Grid.Col>
               </Grid>
             </Card>
-          </Container>
+          </Box>
         </Box>
       )}
 

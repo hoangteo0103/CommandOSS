@@ -1,20 +1,6 @@
 import { Routes, Route } from "react-router-dom";
-import {
-  AppShell,
-  Container,
-  Group,
-  Title,
-  Button,
-  Text,
-  Box,
-  Flex,
-} from "@mantine/core";
-import {
-  IconTicket,
-  IconHome,
-  IconWallet,
-  IconHexagon3d,
-} from "@tabler/icons-react";
+import { AppShell, Group, Title, Button, Text, Box, Flex } from "@mantine/core";
+import { IconHome, IconWallet, IconHexagon3d } from "@tabler/icons-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { WalletButton } from "./components/WalletButton";
 import { HomePage } from "./pages/HomePage";
@@ -37,18 +23,31 @@ function App() {
             "linear-gradient(135deg, rgba(30, 58, 138, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%)",
           backdropFilter: "blur(10px)",
           borderBottom: "1px solid rgba(56, 189, 248, 0.2)",
+          width: "100%",
         },
         main: {
           background:
             "linear-gradient(180deg, rgba(15, 23, 42, 0.03) 0%, rgba(30, 41, 59, 0.05) 100%)",
           minHeight: "100vh",
+          width: "100%",
+          padding: "0",
+        },
+        root: {
+          width: "100%",
         },
       }}
     >
       <AppShell.Header>
-        <Container size="xl" h="100%">
+        <Box
+          style={{
+            maxWidth: "1400px",
+            margin: "0 auto",
+            padding: "0 2rem",
+            height: "100%",
+            width: "100%",
+          }}
+        >
           <Flex h="100%" justify="space-between" align="center">
-            {/* Futuristic Logo */}
             <Group
               gap="md"
               onClick={() => navigate("/")}
@@ -105,7 +104,6 @@ function App() {
               </div>
             </Group>
 
-            {/* Futuristic Navigation */}
             <Group gap="sm">
               <Button
                 variant={location.pathname === "/" ? "gradient" : "subtle"}
@@ -150,10 +148,10 @@ function App() {
               <WalletButton />
             </Group>
           </Flex>
-        </Container>
+        </Box>
       </AppShell.Header>
 
-      <AppShell.Main>
+      <AppShell.Main style={{ width: "100%", padding: "0" }}>
         <style>
           {`
             @keyframes shimmer {
@@ -178,6 +176,22 @@ function App() {
               box-shadow: 0 20px 40px rgba(59, 130, 246, 0.2);
               border-color: rgba(59, 130, 246, 0.3);
             }
+            
+            /* Ensure full width for all elements */
+            html, body, #root {
+              width: 100%;
+              margin: 0;
+              padding: 0;
+            }
+            
+            .mantine-AppShell-root {
+              width: 100% !important;
+            }
+            
+            .mantine-AppShell-main {
+              width: 100% !important;
+              padding: 0 !important;
+            }
           `}
         </style>
 
@@ -188,11 +202,22 @@ function App() {
           <Route
             path="*"
             element={
-              <Container size="xl" py="xl">
+              <Box
+                style={{
+                  padding: "4rem 2rem",
+                  width: "100%",
+                  minHeight: "50vh",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
                 <Box
                   style={{
                     textAlign: "center",
                     padding: "4rem 2rem",
+                    maxWidth: "600px",
+                    width: "100%",
                     background:
                       "linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)",
                     borderRadius: "24px",
@@ -223,7 +248,7 @@ function App() {
                     Return to Universe
                   </Button>
                 </Box>
-              </Container>
+              </Box>
             }
           />
         </Routes>

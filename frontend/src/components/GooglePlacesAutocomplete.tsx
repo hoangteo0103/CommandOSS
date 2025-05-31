@@ -50,8 +50,8 @@ export const GooglePlacesAutocomplete: React.FC<
 
         await loader.load();
 
-        if (inputRef.current && window.google) {
-          autocompleteRef.current = new window.google.maps.places.Autocomplete(
+        if (inputRef.current) {
+          autocompleteRef.current = new google.maps.places.Autocomplete(
             inputRef.current,
             {
               types: ["establishment", "geocode"],
@@ -93,10 +93,8 @@ export const GooglePlacesAutocomplete: React.FC<
     initializeAutocomplete();
 
     return () => {
-      if (autocompleteRef.current && window.google) {
-        window.google.maps.event.clearInstanceListeners(
-          autocompleteRef.current
-        );
+      if (autocompleteRef.current) {
+        google.maps.event.clearInstanceListeners(autocompleteRef.current);
       }
     };
   }, [apiKey, onPlaceSelect]);

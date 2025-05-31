@@ -10,10 +10,11 @@ import type {
   CreateTicketTypeRequest,
   ReserveTicketRequest,
   PurchaseTicketRequest,
+  StorageUploadResponse,
 } from "../types";
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -30,6 +31,50 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// Storage API
+export const storageApi = {
+  uploadFile: async (
+    file: File
+  ): Promise<ApiResponse<StorageUploadResponse>> => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      console.log("Uploading file:", file.name, file.type, file.size);
+
+      const response = await api.post("/storage/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("Upload response:", response.data);
+
+      // The backend now returns { success: true, data: { url }, message }
+      // but we need to return it in the format { data: { url } }
+      if (response.data.success && response.data.data?.url) {
+        return {
+          success: true,
+          data: { url: response.data.data.url },
+          message: response.data.message,
+        };
+      } else {
+        throw new Error(response.data.message || "Upload failed");
+      }
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      throw new Error(
+        error.response?.data?.message || error.message || "Upload failed"
+      );
+    }
+  },
+
+  deleteFile: async (filename: string): Promise<ApiResponse<void>> => {
+    const response = await api.delete(`/storage/file/${filename}`);
+    return response.data;
+  },
+};
 
 // Events API
 export const eventsApi = {

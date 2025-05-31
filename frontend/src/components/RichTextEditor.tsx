@@ -8,6 +8,7 @@ import Superscript from "@tiptap/extension-superscript";
 import SubScript from "@tiptap/extension-subscript";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Text, Box } from "@mantine/core";
+import React from "react";
 
 interface RichTextEditorProps {
   value?: string;
@@ -39,11 +40,24 @@ export const CustomRichTextEditor: React.FC<RichTextEditorProps> = ({
         placeholder,
       }),
     ],
-    content: value,
+    content: value || "",
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
+    editorProps: {
+      attributes: {
+        class:
+          "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none",
+      },
+    },
   });
+
+  // Update editor content when value prop changes
+  React.useEffect(() => {
+    if (editor && value !== editor.getHTML()) {
+      editor.commands.setContent(value || "");
+    }
+  }, [editor, value]);
 
   return (
     <Box>
@@ -132,10 +146,21 @@ export const CustomRichTextEditor: React.FC<RichTextEditorProps> = ({
 
         <RichTextEditor.Content
           style={{
-            minHeight: "150px",
+            minHeight: "200px",
             padding: "20px",
             fontSize: "16px",
             lineHeight: "1.6",
+            "& .ProseMirror": {
+              minHeight: "180px",
+              outline: "none",
+            },
+            "& .ProseMirror p.is-editor-empty:first-child::before": {
+              color: "#adb5bd",
+              content: "attr(data-placeholder)",
+              float: "left",
+              height: 0,
+              pointerEvents: "none",
+            },
           }}
         />
       </RichTextEditor>

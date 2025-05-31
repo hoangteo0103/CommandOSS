@@ -98,3 +98,7 @@ export interface PurchaseTicketRequest {
   orderId: string;
   paymentSignature: string;
 }
+
+export interface StorageUploadResponse {
+  url: string;
+}

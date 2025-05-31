@@ -7,6 +7,8 @@ import { HomePage } from "./pages/HomePage";
 import { EventPage } from "./pages/EventPage";
 import { MyTicketsPage } from "./pages/MyTicketsPage";
 import { CreateEventPage } from "./pages/CreateEventPage";
+import { EditEventPage } from "./pages/EditEventPage";
+import { CheckInPage } from "./pages/CheckInPage";
 import { TicketPurchasePage } from "./pages/TicketPurchasePage";
 import { useWallet } from "./hooks/useWallet";
 
@@ -179,6 +181,36 @@ function App() {
               border-color: rgba(59, 130, 246, 0.3);
             }
             
+            /* Fix badge text padding globally */
+            .mantine-Badge-root {
+              padding-bottom: 2px !important;
+            }
+            
+            .mantine-Badge-label {
+              padding-bottom: 2px !important;
+              display: flex;
+              align-items: center;
+              gap: 6px;
+            }
+            
+            /* Fix for input fields with left sections (icons) */
+            .mantine-TextInput-root .mantine-Input-input[data-with-left-section="true"] {
+              padding-left: 50px !important;
+            }
+            
+            .mantine-TextInput-root .mantine-Input-input {
+              height: auto !important;
+              min-height: 48px !important;
+            }
+            
+            /* Button consistency */
+            .mantine-Button-root {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 8px;
+            }
+            
             /* Ensure full width for all elements */
             html, body, #root {
               width: 100%;
@@ -200,6 +232,8 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/events/:id" element={<EventPage />} />
+          <Route path="/events/:eventId/edit" element={<EditEventPage />} />
+          <Route path="/events/:eventId/check-in" element={<CheckInPage />} />
           <Route
             path="/events/:eventId/purchase/:ticketTypeId"
             element={<TicketPurchasePage />}

@@ -15,6 +15,7 @@ import {
   Alert,
   ActionIcon,
   Box,
+  Button,
 } from "@mantine/core";
 import {
   IconCalendar,
@@ -25,12 +26,15 @@ import {
   IconShare,
   IconAlertCircle,
   IconSparkles,
+  IconEdit,
+  IconScan,
 } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
 import parse from "html-react-parser";
 import { TicketAccordion } from "../components/TicketAccordion";
 import { eventsApi } from "../services/api";
+import { useWallet } from "../hooks/useWallet";
 
 export const EventPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -152,19 +156,54 @@ export const EventPage = () => {
       <Container size="xl" py="xl">
         <Stack gap="xl">
           {/* Back Navigation */}
-          <Group>
-            <ActionIcon
-              variant="gradient"
-              gradient={{ from: "blue", to: "cyan", deg: 45 }}
-              size="xl"
-              onClick={() => navigate("/")}
-              radius="xl"
-            >
-              <IconArrowLeft size={24} />
-            </ActionIcon>
-            <Text size="lg" fw={500} c="blue">
-              Back to Discovery
-            </Text>
+          <Group justify="space-between">
+            <Group>
+              <ActionIcon
+                variant="gradient"
+                gradient={{ from: "blue", to: "cyan", deg: 45 }}
+                size="xl"
+                onClick={() => navigate("/")}
+                radius="xl"
+              >
+                <IconArrowLeft size={24} />
+              </ActionIcon>
+              <Text size="lg" fw={500} c="blue">
+                Back to Discovery
+              </Text>
+            </Group>
+
+            {/* Event Management Actions */}
+            <Group gap="sm">
+              <Button
+                leftSection={<IconEdit size={18} />}
+                onClick={() => navigate(`/events/${id}/edit`)}
+                variant="light"
+                size="lg"
+                radius="xl"
+                style={{
+                  background: "rgba(59, 130, 246, 0.1)",
+                  border: "1px solid rgba(59, 130, 246, 0.2)",
+                  color: "#3b82f6",
+                  fontWeight: 600,
+                }}
+              >
+                Edit Event
+              </Button>
+
+              <Button
+                leftSection={<IconScan size={18} />}
+                onClick={() => navigate(`/events/${id}/check-in`)}
+                variant="gradient"
+                gradient={{ from: "green", to: "teal", deg: 45 }}
+                size="lg"
+                radius="xl"
+                style={{
+                  fontWeight: 600,
+                }}
+              >
+                Check-In
+              </Button>
+            </Group>
           </Group>
 
           {/* Event Header */}
@@ -227,7 +266,20 @@ export const EventPage = () => {
                           : { from: "red", to: "pink", deg: 45 }
                       }
                       leftSection={<IconSparkles size={16} />}
-                      style={{ padding: "12px 20px" }}
+                      styles={{
+                        root: {
+                          paddingLeft: "16px",
+                          paddingRight: "20px",
+                          paddingTop: "12px",
+                          paddingBottom: "12px",
+                        },
+                        label: {
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          paddingBottom: "2px",
+                        },
+                      }}
                     >
                       {isEventPast
                         ? "PAST EVENT"

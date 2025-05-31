@@ -63,7 +63,7 @@ export const TicketPurchasePage = () => {
     ticketTypeId: string;
   }>();
   const navigate = useNavigate();
-  const { isConnected, address } = useWallet();
+  const { isConnected, address, signAndExecuteTransaction } = useWallet();
   const queryClient = useQueryClient();
   const [isProcessing, setIsProcessing] = useState(false);
   const [reservationTime, setReservationTime] = useState<Date | null>(null);
@@ -181,6 +181,8 @@ export const TicketPurchasePage = () => {
       setIsProcessing(false);
     },
     onError: (error) => {
+      console.error("❌ BACKEND PURCHASE NOTIFICATION FAILED:", error);
+
       notifications.show({
         title: "❌ Purchase Failed",
         message:
@@ -214,12 +216,101 @@ export const TicketPurchasePage = () => {
     });
   };
 
-  const handleCompletePurchase = () => {
-    if (reserveMutation.data?.data) {
+  const handleCompletePurchase = async () => {
+    if (!reserveMutation.data?.data) return;
+
+    try {
       setIsProcessing(true);
+
+      // Get reservation data
+      const reservation = reserveMutation.data.data;
+      const totalPriceInSui = reservation.totalPrice; // Assuming price is in SUI
+
+      // Show initial processing notification
+      notifications.show({
+        id: "payment-processing",
+        title: "🔄 Processing Payment",
+        message: `Preparing to pay ${totalPriceInSui} SUI...`,
+        color: "blue",
+        autoClose: false,
+        loading: true,
+      });
+
+      // Create a Sui transaction for payment
+      const { Transaction } = await import("@mysten/sui/transactions");
+      const transaction = new Transaction();
+
+      // Add a transfer coin transaction to the backend's wallet address
+      // This simulates payment - in production you'd transfer to the event organizer
+      const backendWalletAddress =
+        "0x41e5467b71a5c1e12a596edb89b5ba9d335be6494c3d47a527c8c021f821ef9d"; // Your backend wallet
+
+      // Convert SUI to MIST (1 SUI = 1_000_000_000 MIST)
+      const amountInMist = Math.floor(totalPriceInSui * 1_000_000_000);
+
+      transaction.transferObjects(
+        [transaction.splitCoins(transaction.gas, [amountInMist])],
+        backendWalletAddress
+      );
+
+      // Update notification for wallet interaction
+      notifications.update({
+        id: "payment-processing",
+        title: "💳 Wallet Interaction Required",
+        message: "Please confirm the payment in your wallet...",
+        color: "orange",
+        autoClose: false,
+        loading: true,
+      });
+
+      // Sign and execute the transaction
+      const result = await signAndExecuteTransaction(transaction);
+
+      // Close processing notification
+      notifications.hide("payment-processing");
+
+      notifications.show({
+        title: "💳 Payment Successful!",
+        message: `Paid ${totalPriceInSui} SUI - Transaction: ${result.digest?.slice(
+          0,
+          10
+        )}...`,
+        color: "blue",
+        autoClose: 5000,
+      });
+
+      // Log the purchase notification being sent to backend
+      console.log("🚀 SENDING PURCHASE NOTIFICATION TO BACKEND:");
+      console.log("📦 Order ID:", reservation.id);
+      console.log("🔐 Payment Signature:", result.signature || result.digest);
+      console.log("💰 Transaction Digest:", result.digest);
+      console.log("⏰ Timestamp:", new Date().toISOString());
+
+      // Now complete the purchase with the real transaction signature
       purchaseMutation.mutate({
-        orderId: reserveMutation.data.data.id,
-        paymentSignature: "temp-signature", // This would be from actual payment
+        orderId: reservation.id,
+        paymentSignature: result.signature || result.digest, // Use real transaction signature
+      });
+    } catch (error) {
+      setIsProcessing(false);
+      notifications.hide("payment-processing");
+
+      let errorMessage = "Failed to process payment";
+      if (error instanceof Error) {
+        if (error.message.includes("Insufficient")) {
+          errorMessage = "Insufficient SUI balance in your wallet";
+        } else if (error.message.includes("rejected")) {
+          errorMessage = "Payment was rejected by user";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
+      notifications.show({
+        title: "❌ Payment Failed",
+        message: errorMessage,
+        color: "red",
+        autoClose: 7000,
       });
     }
   };
@@ -1047,7 +1138,9 @@ export const TicketPurchasePage = () => {
                         transition: "all 0.3s ease",
                       }}
                     >
-                      💫 Complete Purchase & Mint NFTs
+                      {isProcessing
+                        ? "🔄 Processing Payment..."
+                        : `💫 Pay ${totalPrice.toFixed(2)} SUI & Mint NFTs`}
                     </Button>
                   </Stack>
                 )}

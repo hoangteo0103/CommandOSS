@@ -103,16 +103,33 @@ export const eventsApi = {
 
   // Update event
   updateEvent: async (
-    id: string,
-    data: Partial<CreateEventRequest>
+    eventId: string,
+    eventData: any
   ): Promise<ApiResponse<Event>> => {
-    const response = await api.put(`/events/${id}`, data);
+    const response = await api.put(`/events/${eventId}`, eventData);
     return response.data;
   },
 
   // Delete event
   deleteEvent: async (id: string): Promise<ApiResponse<void>> => {
     const response = await api.delete(`/events/${id}`);
+    return response.data;
+  },
+
+  checkInTicket: async (ticketId: string) => {
+    const response = await api.post(`/booking/check-in/${ticketId}`);
+    return response.data;
+  },
+
+  getTicketInfo: async (ticketId: string) => {
+    const response = await api.get(`/booking/ticket/${ticketId}/info`);
+    return response.data;
+  },
+
+  verifyTicketOwnership: async (ticketId: string, ownerAddress: string) => {
+    const response = await api.get(
+      `/booking/ticket/${ticketId}/verify/${ownerAddress}`
+    );
     return response.data;
   },
 };

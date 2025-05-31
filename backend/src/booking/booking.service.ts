@@ -59,6 +59,16 @@ export interface AdminBookingsFilter {
   limit: number;
 }
 
+export interface CheckInRecord {
+  ticketId: string;
+  eventId?: string;
+  checkedInAt: Date;
+  checkedInBy: string; // Backend service or organizer
+  transactionHash: string;
+  ticketOwner?: string;
+  verified: boolean;
+}
+
 @Injectable()
 export class BookingService {
   private readonly logger = new Logger(BookingService.name);
@@ -67,6 +77,7 @@ export class BookingService {
   // In production, this would use a redis database
   private reservations: Map<string, Reservation> = new Map();
   private purchases: Map<string, Purchase> = new Map();
+  private checkInRecords: Map<string, CheckInRecord> = new Map(); // Track check-ins
 
   // Cache for ticket availability (acts like Redis cache)
   private ticketAvailability: Map<string, Availability> = new Map();
@@ -85,21 +96,14 @@ export class BookingService {
   ): Promise<Availability> {
     const availabilityKey = `${eventId}-${ticketTypeId}`;
 
-    // Check cache first
-    let availability = this.ticketAvailability.get(availabilityKey);
-
-    if (!availability) {
-      // Fetch real event data
-      const event = await this.eventService.findOne(eventId);
-      const ticketType = event.ticketTypes?.find(
-        (tt) => tt.id === ticketTypeId,
+    try {
+      // Get current availability from database
+      const dbAvailability = await this.eventService.getTicketTypeAvailability(
+        eventId,
+        ticketTypeId,
       );
 
-      if (!ticketType) {
-        throw new Error('Ticket type not found');
-      }
-
-      // Calculate real availability
+      // Calculate reserved tickets from in-memory reservations
       const reservedTickets = Array.from(this.reservations.values())
         .filter(
           (r) =>
@@ -109,32 +113,94 @@ export class BookingService {
         )
         .reduce((sum, r) => sum + r.quantity, 0);
 
-      const soldTickets = Array.from(this.reservations.values())
-        .filter(
-          (r) =>
-            r.eventId === eventId &&
-            r.ticketTypeId === ticketTypeId &&
-            r.status === 'completed',
-        )
-        .reduce((sum, r) => sum + r.quantity, 0);
+      // The actual available tickets should account for current reservations
+      const availableTickets = Math.max(
+        0,
+        dbAvailability.availableSupply - reservedTickets,
+      );
 
-      const availableTickets =
-        ticketType.supply - reservedTickets - soldTickets;
-
-      availability = {
-        availableTickets: Math.max(0, availableTickets),
-        totalTickets: ticketType.supply,
+      const availability: Availability = {
+        availableTickets,
+        totalTickets: dbAvailability.totalSupply,
         reservedTickets,
-        soldTickets,
+        soldTickets: dbAvailability.soldSupply,
         isAvailable: availableTickets > 0,
-        pricePerTicket: ticketType.price,
+        pricePerTicket: dbAvailability.pricePerTicket,
       };
 
       // Cache the availability
       this.ticketAvailability.set(availabilityKey, availability);
-    }
 
-    return availability;
+      this.logger.log(
+        `📊 Availability for ${eventId}/${ticketTypeId}: Available=${availableTickets}, Reserved=${reservedTickets}, Sold=${dbAvailability.soldSupply}, Total=${dbAvailability.totalSupply}`,
+      );
+
+      return availability;
+    } catch (error) {
+      this.logger.error(
+        `Failed to get availability from database: ${error.message}`,
+      );
+
+      // Fallback to cache if database query fails
+      let availability = this.ticketAvailability.get(availabilityKey);
+
+      if (!availability) {
+        // Final fallback: try to get from event data directly
+        try {
+          const event = await this.eventService.findOne(eventId);
+          const ticketType = event.ticketTypes?.find(
+            (tt) => tt.id === ticketTypeId,
+          );
+
+          if (!ticketType) {
+            throw new Error('Ticket type not found');
+          }
+
+          // Calculate reserved tickets from in-memory reservations
+          const reservedTickets = Array.from(this.reservations.values())
+            .filter(
+              (r) =>
+                r.eventId === eventId &&
+                r.ticketTypeId === ticketTypeId &&
+                r.status === 'reserved',
+            )
+            .reduce((sum, r) => sum + r.quantity, 0);
+
+          const soldTickets = Array.from(this.reservations.values())
+            .filter(
+              (r) =>
+                r.eventId === eventId &&
+                r.ticketTypeId === ticketTypeId &&
+                r.status === 'completed',
+            )
+            .reduce((sum, r) => sum + r.quantity, 0);
+
+          const availableTickets = Math.max(
+            0,
+            (ticketType.availableSupply || ticketType.supply) - reservedTickets,
+          );
+
+          availability = {
+            availableTickets,
+            totalTickets: ticketType.supply,
+            reservedTickets,
+            soldTickets,
+            isAvailable: availableTickets > 0,
+            pricePerTicket: ticketType.price,
+          };
+
+          // Cache the fallback availability
+          this.ticketAvailability.set(availabilityKey, availability);
+        } catch (fallbackError) {
+          this.logger.error(
+            `Fallback availability calculation failed: ${fallbackError.message}`,
+          );
+          throw new Error('Unable to determine ticket availability');
+        }
+      }
+
+      return availability;
+    }
   }
 
   // Reserve tickets with 15-minute expiration
@@ -263,6 +329,23 @@ export class BookingService {
 
     this.logger.log(`💾 Purchase record saved: ${orderId}`);
 
+    // Update ticket supplies in the database
+    try {
+      await this.eventService.updateTicketSupply(
+        reservation.eventId,
+        reservation.ticketTypeId,
+        reservation.quantity,
+      );
+      this.logger.log(
+        `✅ Updated ticket supply for event ${reservation.eventId}, ticket type ${reservation.ticketTypeId}, quantity: ${reservation.quantity}`,
+      );
+    } catch (error) {
+      this.logger.error(
+        `❌ Failed to update ticket supply in database: ${error.message}`,
+      );
+      // Log but don't fail the purchase since NFTs are already minted
+    }
+
     // TODO: Create ticket records in database
     // This will be implemented when TicketsService is properly injected
     try {
@@ -295,18 +378,16 @@ export class BookingService {
       throw new Error('Reservation cannot be cancelled');
     }
 
-    // Release tickets back to availability
-    const availabilityKey = `${reservation.eventId}-${reservation.ticketTypeId}`;
-    const availability = this.ticketAvailability.get(availabilityKey);
-    if (availability) {
-      availability.availableTickets += reservation.quantity;
-      availability.reservedTickets -= reservation.quantity;
-      this.ticketAvailability.set(availabilityKey, availability);
-    }
+    // Clear availability cache to force refresh from database
+    this.clearAvailabilityCache(reservation.eventId, reservation.ticketTypeId);
 
     // Update reservation status
     reservation.status = 'cancelled';
     this.reservations.set(reservationId, reservation);
+
+    this.logger.log(
+      `❌ Reservation ${reservationId} cancelled, cleared availability cache for ${reservation.eventId}/${reservation.ticketTypeId}`,
+    );
   }
 
   // Get reservation details
@@ -432,18 +513,35 @@ export class BookingService {
       return;
     }
 
-    // Release tickets back to availability
+    // Clear availability cache to force refresh from database
     const availabilityKey = `${reservation.eventId}-${reservation.ticketTypeId}`;
-    const availability = this.ticketAvailability.get(availabilityKey);
-    if (availability) {
-      availability.availableTickets += reservation.quantity;
-      availability.reservedTickets -= reservation.quantity;
-      this.ticketAvailability.set(availabilityKey, availability);
-    }
+    this.ticketAvailability.delete(availabilityKey);
 
     // Update reservation status
     reservation.status = 'expired';
     this.reservations.set(reservationId, reservation);
+
+    this.logger.log(
+      `⏰ Reservation ${reservationId} expired, cleared availability cache for ${reservation.eventId}/${reservation.ticketTypeId}`,
+    );
+  }
+
+  /**
+   * Clear availability cache for specific ticket type
+   */
+  private clearAvailabilityCache(eventId: string, ticketTypeId: string): void {
+    const availabilityKey = `${eventId}-${ticketTypeId}`;
+    this.ticketAvailability.delete(availabilityKey);
+  }
+
+  /**
+   * Clear all availability cache
+   */
+  async refreshAvailabilityCache(): Promise<void> {
+    this.ticketAvailability.clear();
+    this.logger.log(
+      '🔄 Availability cache cleared, will refresh from database on next request',
+    );
   }
 
   private verifyPaymentSignature(
@@ -534,10 +632,73 @@ export class BookingService {
   }
 
   /**
-   * Use/validate a ticket on blockchain
+   * Use/validate a ticket on blockchain with check-in tracking
    */
   async useTicket(ticketId: string): Promise<string> {
-    return await this.suiService.useTicket(ticketId);
+    try {
+      // Check if already checked in
+      if (this.checkInRecords.has(ticketId)) {
+        const existingRecord = this.checkInRecords.get(ticketId);
+        if (existingRecord) {
+          throw new Error(
+            `Ticket already checked in at ${existingRecord.checkedInAt.toISOString()}`,
+          );
+        }
+      }
+
+      // Verify ticket on blockchain (without modifying it)
+      const transactionHash = await this.suiService.useTicket(ticketId);
+
+      // Get ticket info for additional verification
+      const ticketInfo = await this.suiService.getTicketInfo(ticketId);
+
+      // Create check-in record
+      const checkInRecord: CheckInRecord = {
+        ticketId,
+        eventId: ticketInfo?.eventId?.toString(),
+        checkedInAt: new Date(),
+        checkedInBy: 'event-organizer', // Backend service acting as organizer
+        transactionHash,
+        ticketOwner: ticketInfo?.owner,
+        verified: true,
+      };
+
+      // Store check-in record
+      this.checkInRecords.set(ticketId, checkInRecord);
+
+      this.logger.log(`✅ Ticket ${ticketId} checked in and recorded`);
+      this.logger.log(`📊 Total check-ins: ${this.checkInRecords.size}`);
+
+      return transactionHash;
+    } catch (error) {
+      this.logger.error(
+        `❌ Check-in failed for ticket ${ticketId}: ${error.message}`,
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Check if a ticket has been checked in
+   */
+  isTicketCheckedIn(ticketId: string): boolean {
+    return this.checkInRecords.has(ticketId);
+  }
+
+  /**
+   * Get check-in record for a ticket
+   */
+  getCheckInRecord(ticketId: string): CheckInRecord | null {
+    return this.checkInRecords.get(ticketId) || null;
+  }
+
+  /**
+   * Get all check-in records for an event
+   */
+  getEventCheckIns(eventId: string): CheckInRecord[] {
+    return Array.from(this.checkInRecords.values()).filter(
+      (record) => record.eventId === eventId,
+    );
   }
 
   /**

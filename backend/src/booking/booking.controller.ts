@@ -22,16 +22,18 @@ import {
 } from '@nestjs/swagger';
 import { BookingService } from './booking.service';
 import {
-  CreateBookingDto,
   ReserveTicketsDto,
   PurchaseTicketsDto,
 } from './dto/create-booking.dto';
-import { UpdateBookingDto } from './dto/update-booking.dto';
+import { SuiService } from '../sui/sui.service';
 
 @ApiTags('Booking & Reservations')
 @Controller('booking')
 export class BookingController {
-  constructor(private readonly bookingService: BookingService) {}
+  constructor(
+    private readonly bookingService: BookingService,
+    private readonly suiService: SuiService,
+  ) {}
 
   // Reserve tickets (15-minute hold)
   @Post('reserve')
@@ -439,76 +441,62 @@ export class BookingController {
     }
   }
 
-  @Post('ticket/:ticketId/use')
+  @Post('check-in/:ticketId')
   @ApiOperation({
-    summary: 'Use/validate a ticket',
-    description: 'Mark a ticket as used on the blockchain (for event entry)',
+    summary: 'Check-in ticket for event entry',
+    description:
+      'Verify ticket on blockchain and record check-in (does not modify NFT)',
   })
   @ApiParam({ name: 'ticketId', description: 'NFT Ticket Object ID' })
   @ApiResponse({
     status: 200,
-    description: 'Ticket marked as used successfully',
+    description: 'Ticket checked in successfully',
   })
-  @ApiResponse({
-    status: 404,
-    description: 'Ticket not found',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Ticket already used or invalid',
-  })
-  async useTicket(@Param('ticketId') ticketId: string) {
+  async checkInTicket(@Param('ticketId') ticketId: string) {
     try {
-      const transactionHash = await this.bookingService.useTicket(ticketId);
-      return {
-        success: true,
-        data: {
-          ticketId,
-          transactionHash,
-          usedAt: new Date().toISOString(),
-        },
-        message: 'Ticket marked as used successfully',
-      };
-    } catch (error) {
-      throw new HttpException(
-        error.message || 'Failed to use ticket',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-  }
+      // Check if already checked in first
+      const existingCheckIn = this.bookingService.getCheckInRecord(ticketId);
+      if (existingCheckIn) {
+        return {
+          success: false,
+          message: 'Ticket already checked in',
+          checkInRecord: existingCheckIn,
+          alreadyCheckedIn: true,
+        };
+      }
 
-  @Get('ticket/:ticketId/verify/:ownerAddress')
-  @ApiOperation({
-    summary: 'Verify ticket ownership',
-    description: 'Verify that a specific address owns a ticket NFT',
-  })
-  @ApiParam({ name: 'ticketId', description: 'NFT Ticket Object ID' })
-  @ApiParam({ name: 'ownerAddress', description: 'Wallet address to verify' })
-  @ApiResponse({
-    status: 200,
-    description: 'Ownership verification completed',
-  })
-  async verifyTicketOwnership(
-    @Param('ticketId') ticketId: string,
-    @Param('ownerAddress') ownerAddress: string,
-  ) {
-    try {
-      const isOwner = await this.bookingService.verifyTicketOwnership(
-        ticketId,
-        ownerAddress,
-      );
+      // Perform check-in
+      const result = await this.bookingService.useTicket(ticketId);
+
+      // Get ticket info and check-in record
+      const ticketInfo = await this.suiService.getTicketInfo(ticketId);
+      const checkInRecord = this.bookingService.getCheckInRecord(ticketId);
+
       return {
         success: true,
-        data: {
-          ticketId,
-          ownerAddress,
-          isOwner,
-          verifiedAt: new Date().toISOString(),
-        },
+        message: 'Ticket successfully verified and checked in',
+        ticket: ticketInfo,
+        transactionHash: result,
+        checkInRecord,
+        verificationNote:
+          'Ticket verified on Sui blockchain. Check-in recorded separately due to NFT ownership requirements.',
       };
     } catch (error) {
+      const errorMessage = error.message || 'Check-in failed';
+
+      // Handle specific error cases
+      if (errorMessage.includes('already checked in')) {
+        const checkInRecord = this.bookingService.getCheckInRecord(ticketId);
+        return {
+          success: false,
+          message: 'Ticket already checked in',
+          checkInRecord,
+          alreadyCheckedIn: true,
+        };
+      }
+
       throw new HttpException(
-        error.message || 'Failed to verify ownership',
+        `Check-in failed: ${errorMessage}`,
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -533,6 +521,70 @@ export class BookingController {
     } catch (error) {
       throw new HttpException(
         'Failed to get wallet info',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @Get('check-in/stats/:eventId')
+  @ApiOperation({
+    summary: 'Get check-in statistics for an event',
+    description: 'Get check-in records and statistics for a specific event',
+  })
+  @ApiParam({ name: 'eventId', description: 'Event ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Check-in statistics retrieved successfully',
+  })
+  async getEventCheckInStats(@Param('eventId') eventId: string) {
+    try {
+      const checkInRecords = this.bookingService.getEventCheckIns(eventId);
+
+      return {
+        success: true,
+        data: {
+          eventId,
+          totalCheckIns: checkInRecords.length,
+          checkInRecords: checkInRecords.map((record) => ({
+            ticketId: record.ticketId,
+            checkedInAt: record.checkedInAt,
+            ticketOwner: record.ticketOwner,
+            verified: record.verified,
+          })),
+          lastCheckIn:
+            checkInRecords.length > 0
+              ? checkInRecords[checkInRecords.length - 1].checkedInAt
+              : null,
+        },
+      };
+    } catch (error) {
+      throw new HttpException(
+        'Failed to get check-in stats',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @Post('admin/refresh-availability')
+  @ApiOperation({
+    summary: 'Refresh availability cache (Admin)',
+    description: 'Clear availability cache to force refresh from database',
+  })
+  @ApiBearerAuth()
+  @ApiResponse({
+    status: 200,
+    description: 'Availability cache refreshed successfully',
+  })
+  async refreshAvailabilityCache() {
+    try {
+      await this.bookingService.refreshAvailabilityCache();
+      return {
+        success: true,
+        message: 'Availability cache refreshed successfully',
+      };
+    } catch (error) {
+      throw new HttpException(
+        'Failed to refresh availability cache',
         HttpStatus.BAD_REQUEST,
       );
     }

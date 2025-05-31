@@ -9,11 +9,16 @@ import {
   Query,
   ValidationPipe,
   ParseUUIDPipe,
+  Put,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { EventService } from './event.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { HybridSearchService } from '../search/hybrid-search.service';
+import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { Event } from './entities/event.entity';
 
 @Controller('events')
 export class EventController {
@@ -68,7 +73,6 @@ export class EventController {
     };
   }
 
-  // Advanced semantic search endpoint (like Python FastAPI example)
   @Get('search/semantic')
   async semanticSearch(
     @Query('q') query?: string,
@@ -216,17 +220,45 @@ export class EventController {
     };
   }
 
-  @Patch(':id')
+  @Put(':id')
+  @ApiOperation({
+    summary: 'Update an event',
+    description: 'Update an existing event by ID',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Event ID',
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Event updated successfully',
+    type: Event,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Event not found',
+  })
   async update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body(new ValidationPipe()) updateEventDto: UpdateEventDto,
+    @Param('id') id: string,
+    @Body(ValidationPipe) updateEventDto: Partial<CreateEventDto>,
   ) {
-    const event = await this.eventService.update(id, updateEventDto);
-    return {
-      success: true,
-      data: event,
-      message: 'Event updated successfully',
-    };
+    try {
+      const updatedEvent = await this.eventService.update(id, updateEventDto);
+      return {
+        success: true,
+        data: updatedEvent,
+        message: 'Event updated successfully',
+      };
+    } catch (error) {
+      if (error.message.includes('not found')) {
+        throw new HttpException('Event not found', HttpStatus.NOT_FOUND);
+      }
+      throw new HttpException(
+        error.message || 'Failed to update event',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   @Delete(':id')

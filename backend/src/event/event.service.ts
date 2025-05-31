@@ -22,11 +22,18 @@ export class EventService {
         0,
       ) || 0;
 
+    // Initialize ticket types with availableSupply
+    const initializedTicketTypes =
+      createEventDto.ticketTypes?.map((ticketType) => ({
+        ...ticketType,
+        availableSupply: ticketType.availableSupply || ticketType.supply, // Initialize availableSupply if not set
+      })) || [];
+
     const event = this.eventRepository.create({
       ...createEventDto,
       date: new Date(createEventDto.date),
       status: createEventDto.status || 'published',
-      ticketTypes: createEventDto.ticketTypes || [],
+      ticketTypes: initializedTicketTypes,
       totalTickets,
       availableTickets: totalTickets, // Initially all tickets are available
     });
@@ -222,5 +229,107 @@ export class EventService {
 
   private degreesToRadians(degrees: number): number {
     return degrees * (Math.PI / 180);
+  }
+
+  /**
+   * Update ticket supplies when tickets are purchased
+   */
+  async updateTicketSupply(
+    eventId: string,
+    ticketTypeId: string,
+    quantityPurchased: number,
+  ): Promise<Event> {
+    const event = await this.findOne(eventId);
+
+    if (!event.ticketTypes || event.ticketTypes.length === 0) {
+      throw new Error('Event has no ticket types defined');
+    }
+
+    // Find the specific ticket type
+    const ticketTypeIndex = event.ticketTypes.findIndex(
+      (tt) => tt.id === ticketTypeId,
+    );
+
+    if (ticketTypeIndex === -1) {
+      throw new Error(
+        `Ticket type ${ticketTypeId} not found for event ${eventId}`,
+      );
+    }
+
+    const ticketType = event.ticketTypes[ticketTypeIndex];
+
+    // Check if there are enough tickets available
+    if (ticketType.availableSupply < quantityPurchased) {
+      throw new Error(
+        `Insufficient tickets available. Requested: ${quantityPurchased}, Available: ${ticketType.availableSupply}`,
+      );
+    }
+
+    // Update the ticket type's available supply
+    event.ticketTypes[ticketTypeIndex] = {
+      ...ticketType,
+      availableSupply: ticketType.availableSupply - quantityPurchased,
+    };
+
+    // Update the overall available tickets count
+    event.availableTickets = Math.max(
+      0,
+      event.availableTickets - quantityPurchased,
+    );
+
+    // Save the updated event
+    const updatedEvent = await this.eventRepository.save(event);
+
+    // Update index in Qdrant
+    try {
+      await this.qdrantService.indexEvent(updatedEvent);
+    } catch (error) {
+      console.error(
+        'Failed to update event in Qdrant after ticket purchase:',
+        error,
+      );
+    }
+
+    return updatedEvent;
+  }
+
+  /**
+   * Get current availability for a specific ticket type
+   */
+  async getTicketTypeAvailability(
+    eventId: string,
+    ticketTypeId: string,
+  ): Promise<{
+    eventId: string;
+    ticketTypeId: string;
+    ticketTypeName: string;
+    totalSupply: number;
+    availableSupply: number;
+    soldSupply: number;
+    pricePerTicket: number;
+  }> {
+    const event = await this.findOne(eventId);
+
+    if (!event.ticketTypes || event.ticketTypes.length === 0) {
+      throw new Error('Event has no ticket types defined');
+    }
+
+    const ticketType = event.ticketTypes.find((tt) => tt.id === ticketTypeId);
+
+    if (!ticketType) {
+      throw new Error(
+        `Ticket type ${ticketTypeId} not found for event ${eventId}`,
+      );
+    }
+
+    return {
+      eventId,
+      ticketTypeId,
+      ticketTypeName: ticketType.name,
+      totalSupply: ticketType.supply,
+      availableSupply: ticketType.availableSupply,
+      soldSupply: ticketType.supply - ticketType.availableSupply,
+      pricePerTicket: ticketType.price,
+    };
   }
 }

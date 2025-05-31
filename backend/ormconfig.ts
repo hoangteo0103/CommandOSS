@@ -1,4 +1,8 @@
 import { DataSource } from 'typeorm';
+import { config } from 'dotenv';
+
+// Load environment variables
+config();
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -7,8 +11,18 @@ export const AppDataSource = new DataSource({
   username: process.env.DATABASE_USERNAME || 'postgres',
   password: process.env.DATABASE_PASSWORD || 'postgres',
   database: process.env.DATABASE_NAME || 'eventify',
-  entities: ['dist/**/*.entity.js'],
-  migrations: ['dist/migrations/*.js'],
+
+  // Use TypeScript files for development, JavaScript for production
+  entities:
+    process.env.NODE_ENV === 'production'
+      ? ['dist/**/*.entity.js']
+      : ['src/**/*.entity.ts'],
+
+  migrations:
+    process.env.NODE_ENV === 'production'
+      ? ['dist/migrations/*.js']
+      : ['src/migrations/*.ts'],
+
   migrationsTableName: 'migrations',
   synchronize: false,
   logging: true,

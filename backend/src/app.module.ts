@@ -6,6 +6,8 @@ import { EventModule } from './event/event.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
+import { BookingModule } from './booking/booking.module';
+import { TicketsModule } from './tickets/tickets.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { ConfigService } from '@nestjs/config';
       }),
       inject: [ConfigService],
     }),
+    BookingModule,
+    TicketsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

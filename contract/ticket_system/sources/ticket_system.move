@@ -7,10 +7,6 @@ module ticket_system::ticket_system;
 // https://docs.sui.io/concepts/sui-move-concepts/conventions
 
 module ticket_system::ticket_system {
-    use sui::object::{Self, UID};
-    use sui::transfer;
-    use sui::tx_context::{Self, TxContext};
-
     /// Ticket struct representing a ticket for an event
     public struct Ticket has key, store {
         id: UID,
@@ -29,7 +25,7 @@ module ticket_system::ticket_system {
         ticket_type: u8, 
         ctx: &mut TxContext
     ) {
-        let sender = tx_context::sender(ctx);
+        let sender = ctx.sender();
         let ticket = Ticket {
             id: object::new(ctx),
             event_id,
@@ -46,7 +42,7 @@ module ticket_system::ticket_system {
         ticket: &mut Ticket,
         ctx: &mut TxContext
     ) {
-        let sender = tx_context::sender(ctx);
+        let sender = ctx.sender();
         assert!(ticket.owner == sender, 0);
         assert!(!ticket.used, E_TICKET_ALREADY_USED);
         

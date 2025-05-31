@@ -1,14 +1,15 @@
-import { RichTextEditor, Link } from "@mantine/tiptap";
-import { useEditor } from "@tiptap/react";
-import Highlight from "@tiptap/extension-highlight";
-import StarterKit from "@tiptap/starter-kit";
-import Underline from "@tiptap/extension-underline";
-import TextAlign from "@tiptap/extension-text-align";
-import Superscript from "@tiptap/extension-superscript";
-import SubScript from "@tiptap/extension-subscript";
-import Placeholder from "@tiptap/extension-placeholder";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import ReactQuill, { Quill } from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
+import BlotFormatter from "quill-blot-formatter";
 import { Text, Box } from "@mantine/core";
 import React from "react";
+import { storageApi } from "../services/api";
+import { notifications } from "@mantine/notifications";
+import { IconCheck, IconX } from "@tabler/icons-react";
+
+// Register the BlotFormatter module
+Quill.register("modules/blotFormatter", BlotFormatter);
 
 interface RichTextEditorProps {
   value?: string;
@@ -27,49 +28,129 @@ export const CustomRichTextEditor: React.FC<RichTextEditorProps> = ({
   error,
   required,
 }) => {
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Underline,
-      Link,
-      Superscript,
-      SubScript,
-      Highlight,
-      TextAlign.configure({ types: ["heading", "paragraph"] }),
-      Placeholder.configure({
-        placeholder,
-      }),
-    ],
-    content: value || "",
-    onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
-    },
-    editorProps: {
-      attributes: {
-        class:
-          "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none",
-      },
-    },
-  });
+  const quillRef = useRef<ReactQuill>(null);
 
-  // Update editor content when value prop changes
-  React.useEffect(() => {
-    if (editor && value !== editor.getHTML()) {
-      editor.commands.setContent(value || "");
+  const uploadFile = async (file: File): Promise<string> => {
+    try {
+      const result = await storageApi.uploadFile(file);
+      if (result.data?.url) {
+        notifications.show({
+          title: "Upload Successful",
+          message: "Image uploaded successfully",
+          color: "green",
+          icon: <IconCheck size={16} />,
+        });
+        return result.data.url;
+      }
+      throw new Error("Upload failed");
+    } catch (error) {
+      notifications.show({
+        title: "Upload Failed",
+        message: "Failed to upload image. Please try again.",
+        color: "red",
+        icon: <IconX size={16} />,
+      });
+      throw error;
     }
-  }, [editor, value]);
+  };
+
+  const imageHandler = useCallback(() => {
+    const input = document.createElement("input");
+    input.setAttribute("type", "file");
+    input.setAttribute("accept", "image/*");
+    input.click();
+
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+
+      const quill = quillRef.current?.getEditor();
+      if (!quill) return;
+
+      // Save current cursor state
+      const range = quill.getSelection(true);
+
+      // Insert temporary loading placeholder
+      quill.insertEmbed(
+        range.index,
+        "image",
+        "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTQiIHN0cm9rZT0iIzMzOEVGNyIgc3Ryb2tlLXdpZHRoPSI0Ii8+CjxwYXRoIGQ9Ik0xNiA4VjI0IiBzdHJva2U9IiMzMzhFRjciIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CjxwYXRoIGQ9Ik04IDE2SDI0IiBzdHJva2U9IiMzMzhFRjciIHN0cm9rZS13aWR0aD0iNCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+Cjwvc3ZnPgo="
+      );
+
+      // Move cursor to right side of image
+      quill.setSelection(range.index + 1);
+
+      try {
+        const imageUrl = await uploadFile(file);
+
+        // Remove placeholder image
+        quill.deleteText(range.index, 1);
+
+        // Insert uploaded image
+        quill.insertEmbed(range.index, "image", imageUrl);
+      } catch (error) {
+        // Remove placeholder on error
+        quill.deleteText(range.index, 1);
+      }
+    };
+  }, []);
+
+  const modules = useMemo(
+    () => ({
+      toolbar: {
+        container: [
+          [{ header: [1, 2, 3, 4, false] }],
+          ["bold", "italic", "underline", "strike"],
+          [{ list: "ordered" }, { list: "bullet" }],
+          [{ indent: "-1" }, { indent: "+1" }],
+          ["blockquote", "code-block"],
+          ["link", "image"],
+          [{ align: [] }],
+          [{ color: [] }, { background: [] }],
+          ["clean"],
+        ],
+        handlers: {
+          image: imageHandler,
+        },
+      },
+      blotFormatter: {
+        overlay: {
+          style: {
+            border: "2px solid #3b82f6",
+          },
+        },
+      },
+    }),
+    [imageHandler]
+  );
+
+  const formats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "blockquote",
+    "list",
+    "bullet",
+    "indent",
+    "link",
+    "image",
+    "align",
+    "color",
+    "background",
+    "code-block",
+  ];
 
   return (
     <Box>
       {label && (
         <Text
           component="label"
-          size="sm"
-          fw={500}
+          size="md"
+          fw={600}
           mb="xs"
-          style={{
-            color: error ? "#fa5252" : "var(--mantine-color-text)",
-          }}
+          c={error ? "red" : "dark"}
         >
           {label}
           {required && (
@@ -80,96 +161,100 @@ export const CustomRichTextEditor: React.FC<RichTextEditorProps> = ({
         </Text>
       )}
 
-      <RichTextEditor
-        editor={editor}
+      <Box
         style={{
-          border: error
-            ? "1px solid #fa5252"
-            : "1px solid rgba(59, 130, 246, 0.2)",
-          borderRadius: "24px",
-          background: "rgba(255, 255, 255, 0.9)",
+          border: error ? "2px solid #fa5252" : "2px solid #ced4da",
+          borderRadius: "8px",
           overflow: "hidden",
+          backgroundColor: "#ffffff",
         }}
       >
-        <RichTextEditor.Toolbar
-          sticky
-          stickyOffset={60}
+        <ReactQuill
+          ref={quillRef}
+          value={value}
+          onChange={onChange}
+          modules={modules}
+          formats={formats}
+          placeholder={placeholder}
           style={{
-            background: "rgba(249, 250, 251, 0.95)",
-            backdropFilter: "blur(10px)",
-            borderBottom: "1px solid rgba(59, 130, 246, 0.1)",
+            backgroundColor: "#ffffff",
           }}
-        >
-          <RichTextEditor.ControlsGroup>
-            <RichTextEditor.Bold />
-            <RichTextEditor.Italic />
-            <RichTextEditor.Underline />
-            <RichTextEditor.Strikethrough />
-            <RichTextEditor.ClearFormatting />
-            <RichTextEditor.Highlight />
-            <RichTextEditor.Code />
-          </RichTextEditor.ControlsGroup>
-
-          <RichTextEditor.ControlsGroup>
-            <RichTextEditor.H1 />
-            <RichTextEditor.H2 />
-            <RichTextEditor.H3 />
-            <RichTextEditor.H4 />
-          </RichTextEditor.ControlsGroup>
-
-          <RichTextEditor.ControlsGroup>
-            <RichTextEditor.Blockquote />
-            <RichTextEditor.Hr />
-            <RichTextEditor.BulletList />
-            <RichTextEditor.OrderedList />
-            <RichTextEditor.Subscript />
-            <RichTextEditor.Superscript />
-          </RichTextEditor.ControlsGroup>
-
-          <RichTextEditor.ControlsGroup>
-            <RichTextEditor.Link />
-            <RichTextEditor.Unlink />
-          </RichTextEditor.ControlsGroup>
-
-          <RichTextEditor.ControlsGroup>
-            <RichTextEditor.AlignLeft />
-            <RichTextEditor.AlignCenter />
-            <RichTextEditor.AlignJustify />
-            <RichTextEditor.AlignRight />
-          </RichTextEditor.ControlsGroup>
-
-          <RichTextEditor.ControlsGroup>
-            <RichTextEditor.Undo />
-            <RichTextEditor.Redo />
-          </RichTextEditor.ControlsGroup>
-        </RichTextEditor.Toolbar>
-
-        <RichTextEditor.Content
-          style={{
-            minHeight: "200px",
-            padding: "20px",
-            fontSize: "16px",
-            lineHeight: "1.6",
-            "& .ProseMirror": {
-              minHeight: "180px",
-              outline: "none",
-            },
-            "& .ProseMirror p.is-editor-empty:first-child::before": {
-              color: "#adb5bd",
-              content: "attr(data-placeholder)",
-              float: "left",
-              height: 0,
-              pointerEvents: "none",
-            },
-          }}
+          theme="snow"
         />
-      </RichTextEditor>
+      </Box>
 
       {error && (
         <Text size="sm" c="red" mt="xs">
           {error}
         </Text>
       )}
+
+      <style>{`
+        .ql-editor {
+          min-height: 180px;
+          font-size: 16px;
+          line-height: 1.6;
+          color: #212529;
+        }
+        
+        .ql-toolbar {
+          border-bottom: 1px solid #ced4da !important;
+          background-color: #f8f9fa;
+        }
+        
+        .ql-container {
+          border: none !important;
+          font-family: inherit;
+        }
+        
+        .ql-editor.ql-blank::before {
+          color: #6c757d;
+          font-style: normal;
+        }
+        
+        /* Better button styles */
+        .ql-toolbar .ql-picker-label {
+          color: #495057;
+        }
+        
+        .ql-toolbar .ql-picker-options {
+          background-color: white;
+          border: 1px solid #ced4da;
+          border-radius: 4px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .ql-toolbar button {
+          color: #495057;
+        }
+        
+        .ql-toolbar button:hover {
+          color: #212529;
+        }
+        
+        .ql-toolbar button.ql-active {
+          color: #3b82f6;
+        }
+        
+        /* Image resizing handles */
+        .blot-formatter__toolbar {
+          background: white;
+          border: 1px solid #ced4da;
+          border-radius: 4px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .blot-formatter__toolbar-button {
+          color: #495057;
+          border: none;
+          background: none;
+          padding: 4px 8px;
+        }
+        
+        .blot-formatter__toolbar-button:hover {
+          background-color: #f8f9fa;
+        }
+      `}</style>
     </Box>
   );
 };

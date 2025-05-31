@@ -368,11 +368,13 @@ export const EventDetailsStep: React.FC<EventDetailsStepProps> = ({
               Event Logo
             </Text>
             <FileInput
+              key={`logo-${form.values.logo ? "uploaded" : "empty"}`}
               placeholder="Upload event logo (JPG, PNG)"
               accept="image/*"
               leftSection={<IconPhoto size={18} />}
               size="lg"
               radius="xl"
+              value={form.values.logo}
               onChange={(file) => handleFileUpload(file, "logo")}
               disabled={uploading}
               styles={{
@@ -447,11 +449,13 @@ export const EventDetailsStep: React.FC<EventDetailsStepProps> = ({
               Event Banner
             </Text>
             <FileInput
+              key={`banner-${form.values.banner ? "uploaded" : "empty"}`}
               placeholder="Upload event banner (JPG, PNG)"
               accept="image/*"
               leftSection={<IconPhoto size={18} />}
               size="lg"
               radius="xl"
+              value={form.values.banner}
               onChange={(file) => handleFileUpload(file, "banner")}
               disabled={uploading}
               styles={{

@@ -1,11 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { AppShell, Group, Title, Button, Text, Box, Flex } from "@mantine/core";
-import {
-  IconHome,
-  IconWallet,
-  IconHexagon3d,
-  IconSearch,
-} from "@tabler/icons-react";
+import { IconHome, IconWallet, IconHexagon3d } from "@tabler/icons-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { WalletButton } from "./components/WalletButton";
 import { HomePage } from "./pages/HomePage";

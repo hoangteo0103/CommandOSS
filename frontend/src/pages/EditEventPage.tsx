@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   Group,
-  Stack,
   Stepper,
   Title,
   Text,
@@ -148,7 +147,7 @@ export const EditEventPage = () => {
       });
       navigate(`/events/${eventId}`);
     },
-    onError: (error) => {
+    onError: () => {
       notifications.show({
         title: "Update Failed",
         message: "Failed to update event. Please try again.",

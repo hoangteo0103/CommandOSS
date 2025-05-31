@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Container,
   Title,
   Text,
   Grid,
@@ -17,7 +16,6 @@ import {
   Flex,
   Badge,
   Card,
-  Image,
   ActionIcon,
   Chip,
 } from "@mantine/core";
@@ -33,17 +31,13 @@ import {
 } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { EventCard } from "../components/EventCard";
-import { WalletButton } from "../components/WalletButton";
 import { eventsApi } from "../services/api";
 import { useWallet } from "../hooks/useWallet";
-import type { Event } from "../types";
 
 export const HomePage = () => {
   const { isConnected } = useWallet();
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [featuredEvents, setFeaturedEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const {
@@ -81,12 +75,9 @@ export const HomePage = () => {
       try {
         const response = await eventsApi.getEvents(1, 6);
         if (response.data) {
-          setFeaturedEvents(response.data);
         }
       } catch (error) {
         console.error("Failed to fetch featured events:", error);
-      } finally {
-        setLoading(false);
       }
     };
 

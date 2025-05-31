@@ -18,15 +18,11 @@ import {
   Box,
   Skeleton,
   ThemeIcon,
-  Progress,
-  Flex,
   Image,
   Tooltip,
   ActionIcon,
-  Notification,
   Paper,
   Divider,
-  RingProgress,
   Timeline,
   Modal,
   NumberFormatter,
@@ -50,9 +46,7 @@ import {
   IconStar,
   IconDiamond,
   IconBolt,
-  IconHeart,
   IconWallet,
-  IconChevronRight,
   IconGift,
   IconCertificate,
   IconShieldCheck,
@@ -61,7 +55,6 @@ import {
   IconCoin,
 } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
-import { TicketList } from "../components/TicketList";
 import { WalletButton } from "../components/WalletButton";
 import { useWallet } from "../hooks/useWallet";
 import { ticketsApi } from "../services/api";
@@ -838,9 +831,8 @@ export const MyTicketsPage = () => {
 };
 
 // Enhanced Ticket Card Component
-const TicketCard = ({ ticket, onView, onShare, index }: any) => {
+const TicketCard = ({ ticket, onView, onShare }: any) => {
   const isUpcoming = ticket.event && new Date(ticket.event.date) > new Date();
-  const isPast = ticket.event && new Date(ticket.event.date) <= new Date();
   const [miniQrCode, setMiniQrCode] = useState<string>("");
   useEffect(() => {
     const generateMiniQr = async () => {
@@ -1130,24 +1122,6 @@ const TicketDetailContent = ({ ticket, onClose }: any) => {
 
     generateQrCode();
   }, [ticket]);
-
-  const handleCopyNftId = () => {
-    navigator.clipboard.writeText(ticket.nftTokenId);
-    notifications.show({
-      title: "✅ Copied!",
-      message: "NFT Token ID copied to clipboard",
-      color: "green",
-    });
-  };
-
-  const handleCopyTxHash = () => {
-    navigator.clipboard.writeText(ticket.transactionHash);
-    notifications.show({
-      title: "✅ Copied!",
-      message: "Transaction hash copied to clipboard",
-      color: "green",
-    });
-  };
 
   return (
     <Stack gap="lg">

@@ -18,8 +18,6 @@ import {
 import {
   IconSearch,
   IconCalendar,
-  IconTag,
-  IconFilter,
   IconX,
   IconRefresh,
   IconChevronDown,

@@ -7,15 +7,11 @@ import {
   Stack,
   Card,
   Badge,
-  Image,
   Box,
   Alert,
   Stepper,
-  Anchor,
   ActionIcon,
   Paper,
-  Center,
-  Loader,
 } from "@mantine/core";
 import {
   IconWallet,

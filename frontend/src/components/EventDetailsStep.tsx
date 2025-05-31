@@ -13,7 +13,6 @@ import {
   Card,
   Flex,
   Loader,
-  Center,
 } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import {
@@ -22,7 +21,6 @@ import {
   IconMapPin,
   IconCalendar,
   IconUser,
-  IconUpload,
 } from "@tabler/icons-react";
 import { GooglePlacesAutocomplete } from "./GooglePlacesAutocomplete";
 import { CustomRichTextEditor } from "./RichTextEditor";
@@ -32,22 +30,6 @@ import { useMutation } from "@tanstack/react-query";
 import { storageApi } from "../services/api";
 import type { ApiResponse, StorageUploadResponse } from "../types";
 import { useState } from "react";
-
-interface EventFormData {
-  name: string;
-  logo: File | null;
-  banner: File | null;
-  logoUrl: string;
-  bannerUrl: string;
-  location: string;
-  latitude: number | null;
-  longitude: number | null;
-  placeId: string;
-  description: string;
-  categories: string[];
-  organizerName: string;
-  date: string;
-}
 
 interface PlaceDetails {
   name: string;
@@ -89,7 +71,6 @@ export const EventDetailsStep: React.FC<EventDetailsStepProps> = ({
   bannerPreview,
   setLogoPreview,
   setBannerPreview,
-  uploading,
   setUploading,
 }) => {
   const [uploadingType, setUploadingType] = useState<"logo" | "banner" | null>(
@@ -98,7 +79,7 @@ export const EventDetailsStep: React.FC<EventDetailsStepProps> = ({
 
   const uploadFileMutation = useMutation({
     mutationFn: (file: File) => storageApi.uploadFile(file),
-    onError: (error) => {
+    onError: () => {
       notifications.show({
         title: "Upload Failed",
         message: "Failed to upload file. Please try again.",

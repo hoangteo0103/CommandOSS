@@ -2,7 +2,6 @@ import {
   Stack,
   TextInput,
   NumberInput,
-  Paper,
   Group,
   Button,
   ActionIcon,

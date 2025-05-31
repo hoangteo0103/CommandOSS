@@ -42,6 +42,7 @@ export interface Ticket {
   isUsed: boolean;
   purchaseDate: string;
   event?: Event;
+  price: number;
   ticketType?: TicketType;
 }
 

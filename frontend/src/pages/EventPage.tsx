@@ -34,7 +34,6 @@ import { notifications } from "@mantine/notifications";
 import parse from "html-react-parser";
 import { TicketAccordion } from "../components/TicketAccordion";
 import { eventsApi } from "../services/api";
-import { useWallet } from "../hooks/useWallet";
 
 export const EventPage = () => {
   const { id } = useParams<{ id: string }>();

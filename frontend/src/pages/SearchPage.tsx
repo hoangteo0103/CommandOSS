@@ -240,7 +240,6 @@ const SearchPageContent = () => {
     maxLon?: number;
   }>({});
   const [isMapInteracted, setIsMapInteracted] = useState(false);
-  const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [shouldAutoFit, setShouldAutoFit] = useState(true);
 
   const mapRef = useRef<google.maps.Map | null>(null);
@@ -342,7 +341,6 @@ const SearchPageContent = () => {
   // Handle map load
   const handleMapLoad = useCallback((map: google.maps.Map) => {
     mapRef.current = map;
-    setIsMapLoaded(true);
 
     // Add listeners for user interaction
     map.addListener("dragstart", () => {

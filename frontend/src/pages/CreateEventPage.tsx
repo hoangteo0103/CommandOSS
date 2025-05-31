@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   Group,
-  Stack,
   Stepper,
   Title,
   Text,
@@ -117,7 +116,7 @@ export const CreateEventPage = () => {
         navigate("/");
       }
     },
-    onError: (error) => {
+    onError: () => {
       notifications.show({
         title: "Creation Failed",
         message: "Failed to create event. Please try again.",

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Group, Text, Menu, Box } from "@mantine/core";
+import { Button, Group, Menu, Box } from "@mantine/core";
 import {
   IconWallet,
   IconLogout,

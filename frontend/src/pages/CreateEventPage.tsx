@@ -273,8 +273,7 @@ export const CreateEventPage = () => {
                 leftSection={<IconRocket size={16} />}
                 variant="gradient"
                 gradient={{ from: "blue", to: "cyan", deg: 45 }}
-                size="xl"
-                style={{ padding: "16px 24px" }}
+                size="lg"
               >
                 NFT POWERED
               </Badge>

@@ -155,6 +155,57 @@ export const HomePage = () => {
           }}
         />
 
+        {/* Floating Particles */}
+        <Box
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: `
+              radial-gradient(2px 2px at 30px 50px, rgba(59, 130, 246, 0.6), transparent),
+              radial-gradient(2px 2px at 80px 20px, rgba(139, 92, 246, 0.6), transparent),
+              radial-gradient(1px 1px at 120px 80px, rgba(6, 182, 212, 0.8), transparent),
+              radial-gradient(1px 1px at 200px 30px, rgba(168, 85, 247, 0.6), transparent),
+              radial-gradient(2px 2px at 300px 60px, rgba(59, 130, 246, 0.4), transparent)
+            `,
+            animation: "float 6s ease-in-out infinite",
+            opacity: 0.7,
+          }}
+        />
+
+        {/* Gradient Orbs */}
+        <Box
+          style={{
+            position: "absolute",
+            top: "20%",
+            left: "10%",
+            width: "100px",
+            height: "100px",
+            background:
+              "radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, transparent 70%)",
+            borderRadius: "50%",
+            animation: "float 8s ease-in-out infinite",
+            filter: "blur(1px)",
+          }}
+        />
+
+        <Box
+          style={{
+            position: "absolute",
+            top: "60%",
+            right: "15%",
+            width: "80px",
+            height: "80px",
+            background:
+              "radial-gradient(circle, rgba(139, 92, 246, 0.4) 0%, transparent 70%)",
+            borderRadius: "50%",
+            animation: "float 10s ease-in-out infinite reverse",
+            filter: "blur(1px)",
+          }}
+        />
+
         <Box
           style={{
             position: "relative",
@@ -204,14 +255,23 @@ export const HomePage = () => {
               {isConnected && (
                 <Button
                   leftSection={<IconPlus size={20} />}
+                  rightSection={<IconArrowRight size={18} />}
                   onClick={() => navigate("/admin/create-event")}
-                  variant="outline"
+                  variant="gradient"
+                  gradient={{ from: "violet", to: "indigo", deg: 45 }}
                   size="xl"
                   radius="xl"
+                  className="create-event-btn"
                   style={{
-                    borderColor: "rgba(59, 130, 246, 0.3)",
-                    color: "#3b82f6",
                     padding: "16px 32px",
+                    fontWeight: 700,
+                    letterSpacing: "0.05em",
+                    textTransform: "uppercase",
+                    boxShadow: "0 12px 40px rgba(139, 92, 246, 0.4)",
+                    border: "1px solid rgba(139, 92, 246, 0.3)",
+                    position: "relative",
+                    overflow: "hidden",
+                    transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                   }}
                 >
                   Create Event
@@ -354,7 +414,7 @@ export const HomePage = () => {
                   color="blue"
                   radius="xl"
                   leftSection={<IconTrendingUp size={18} />}
-                  onClick={() => navigate("/search")}
+                  onClick={() => navigate("/search?q=")}
                 >
                   Browse All Events
                 </Button>
@@ -682,6 +742,51 @@ export const HomePage = () => {
           @keyframes pulse {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.8; transform: scale(1.05); }
+          }
+          
+          @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+          }
+          
+          @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+          }
+          
+          .create-event-btn {
+            position: relative;
+            overflow: hidden;
+          }
+          
+          .create-event-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+              90deg,
+              transparent,
+              rgba(255, 255, 255, 0.4),
+              transparent
+            );
+            transition: left 0.6s ease;
+          }
+          
+          .create-event-btn:hover::before {
+            left: 100%;
+          }
+          
+          .create-event-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 20px 60px rgba(139, 92, 246, 0.6);
+            border-color: rgba(139, 92, 246, 0.6);
+          }
+          
+          .create-event-btn:active {
+            transform: translateY(-1px) scale(1.02);
           }
         `}
       </style>

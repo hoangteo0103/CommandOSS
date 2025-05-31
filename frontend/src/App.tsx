@@ -1,35 +1,235 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Routes, Route } from "react-router-dom";
+import {
+  AppShell,
+  Container,
+  Group,
+  Title,
+  Button,
+  Text,
+  Box,
+  Flex,
+} from "@mantine/core";
+import {
+  IconTicket,
+  IconHome,
+  IconWallet,
+  IconHexagon3d,
+} from "@tabler/icons-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { WalletButton } from "./components/WalletButton";
+import { HomePage } from "./pages/HomePage";
+import { EventPage } from "./pages/EventPage";
+import { MyTicketsPage } from "./pages/MyTicketsPage";
+import { useWallet } from "./hooks/useWallet";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { isConnected } = useWallet();
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <AppShell
+      header={{ height: 90 }}
+      padding="0"
+      styles={{
+        header: {
+          background:
+            "linear-gradient(135deg, rgba(30, 58, 138, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%)",
+          backdropFilter: "blur(10px)",
+          borderBottom: "1px solid rgba(56, 189, 248, 0.2)",
+        },
+        main: {
+          background:
+            "linear-gradient(180deg, rgba(15, 23, 42, 0.03) 0%, rgba(30, 41, 59, 0.05) 100%)",
+          minHeight: "100vh",
+        },
+      }}
+    >
+      <AppShell.Header>
+        <Container size="xl" h="100%">
+          <Flex h="100%" justify="space-between" align="center">
+            {/* Futuristic Logo */}
+            <Group
+              gap="md"
+              onClick={() => navigate("/")}
+              style={{ cursor: "pointer" }}
+            >
+              <Box
+                style={{
+                  background:
+                    "linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)",
+                  borderRadius: "12px",
+                  padding: "12px",
+                  boxShadow: "0 8px 32px rgba(59, 130, 246, 0.3)",
+                  position: "relative",
+                  overflow: "hidden",
+                }}
+              >
+                <IconHexagon3d size={28} color="white" />
+                <Box
+                  style={{
+                    position: "absolute",
+                    top: "-50%",
+                    left: "-50%",
+                    width: "200%",
+                    height: "200%",
+                    background:
+                      "linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%)",
+                    animation: "shimmer 3s infinite",
+                  }}
+                />
+              </Box>
+              <div>
+                <Title
+                  order={1}
+                  size="h2"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    fontWeight: 800,
+                    letterSpacing: "-0.02em",
+                  }}
+                >
+                  SuiTickets
+                </Title>
+                <Text
+                  size="sm"
+                  c="dimmed"
+                  fw={500}
+                  style={{ letterSpacing: "0.05em" }}
+                >
+                  Next-Gen NFT Ticketing
+                </Text>
+              </div>
+            </Group>
+
+            {/* Futuristic Navigation */}
+            <Group gap="sm">
+              <Button
+                variant={location.pathname === "/" ? "gradient" : "subtle"}
+                gradient={{ from: "blue", to: "cyan", deg: 45 }}
+                leftSection={<IconHome size={16} />}
+                onClick={() => navigate("/")}
+                size="md"
+                radius="xl"
+                style={{
+                  transition: "all 0.3s ease",
+                  ...(location.pathname !== "/" && {
+                    backgroundColor: "rgba(59, 130, 246, 0.1)",
+                    border: "1px solid rgba(59, 130, 246, 0.2)",
+                  }),
+                }}
+              >
+                Discover
+              </Button>
+
+              {isConnected && (
+                <Button
+                  variant={
+                    location.pathname === "/my-tickets" ? "gradient" : "subtle"
+                  }
+                  gradient={{ from: "violet", to: "purple", deg: 45 }}
+                  leftSection={<IconWallet size={16} />}
+                  onClick={() => navigate("/my-tickets")}
+                  size="md"
+                  radius="xl"
+                  style={{
+                    transition: "all 0.3s ease",
+                    ...(location.pathname !== "/my-tickets" && {
+                      backgroundColor: "rgba(139, 92, 246, 0.1)",
+                      border: "1px solid rgba(139, 92, 246, 0.2)",
+                    }),
+                  }}
+                >
+                  My NFTs
+                </Button>
+              )}
+
+              <WalletButton />
+            </Group>
+          </Flex>
+        </Container>
+      </AppShell.Header>
+
+      <AppShell.Main>
+        <style>
+          {`
+            @keyframes shimmer {
+              0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+              100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+            }
+            
+            @keyframes pulse-glow {
+              0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+              50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.6); }
+            }
+            
+            .futuristic-card {
+              background: rgba(255, 255, 255, 0.95);
+              backdrop-filter: blur(10px);
+              border: 1px solid rgba(59, 130, 246, 0.1);
+              transition: all 0.3s ease;
+            }
+            
+            .futuristic-card:hover {
+              transform: translateY(-4px);
+              box-shadow: 0 20px 40px rgba(59, 130, 246, 0.2);
+              border-color: rgba(59, 130, 246, 0.3);
+            }
+          `}
+        </style>
+
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/events/:id" element={<EventPage />} />
+          <Route path="/my-tickets" element={<MyTicketsPage />} />
+          <Route
+            path="*"
+            element={
+              <Container size="xl" py="xl">
+                <Box
+                  style={{
+                    textAlign: "center",
+                    padding: "4rem 2rem",
+                    background:
+                      "linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)",
+                    borderRadius: "24px",
+                    border: "1px solid rgba(59, 130, 246, 0.1)",
+                  }}
+                >
+                  <Title
+                    order={2}
+                    mb="md"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                    }}
+                  >
+                    Page Not Found
+                  </Title>
+                  <Text c="dimmed" mb="lg" size="lg">
+                    The page you're looking for doesn't exist in the blockchain.
+                  </Text>
+                  <Button
+                    onClick={() => navigate("/")}
+                    gradient={{ from: "blue", to: "cyan", deg: 45 }}
+                    size="lg"
+                    radius="xl"
+                  >
+                    Return to Universe
+                  </Button>
+                </Box>
+              </Container>
+            }
+          />
+        </Routes>
+      </AppShell.Main>
+    </AppShell>
+  );
 }
 
-export default App
+export default App;

@@ -8,7 +8,6 @@ import {
   Stack,
   Group,
   Badge,
-  Button,
   Divider,
   Card,
   Center,
@@ -29,7 +28,8 @@ import {
 } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { notifications } from "@mantine/notifications";
-import { TicketPurchaseForm } from "../components/TicketPurchaseForm";
+import parse from "html-react-parser";
+import { TicketAccordion } from "../components/TicketAccordion";
 import { eventsApi } from "../services/api";
 
 export const EventPage = () => {
@@ -40,7 +40,6 @@ export const EventPage = () => {
     data: eventData,
     isLoading,
     error,
-    refetch,
   } = useQuery({
     queryKey: ["event", id],
     queryFn: () => eventsApi.getEvent(id!),
@@ -63,7 +62,7 @@ export const EventPage = () => {
   const handleShare = async () => {
     try {
       await navigator.share({
-        title: event?.title,
+        title: event?.name,
         text: event?.description,
         url: window.location.href,
       });
@@ -182,8 +181,10 @@ export const EventPage = () => {
                 }}
               >
                 <Image
-                  src={event.imageUrl || "/placeholder-event.jpg"}
-                  alt={event.title}
+                  src={
+                    event.bannerUrl || event.logoUrl || "/placeholder-event.jpg"
+                  }
+                  alt={event.name}
                   height={500}
                   radius="xl"
                   fallbackSrc="https://placehold.co/800x500/1e293b/64748b?text=Future+Event"
@@ -259,11 +260,23 @@ export const EventPage = () => {
                         lineHeight: 1.2,
                       }}
                     >
-                      {event.title}
+                      {event.name}
                     </Title>
-                    <Text size="lg" c="dimmed" lineClamp={4}>
-                      {event.description}
-                    </Text>
+                    <Box
+                      size="lg"
+                      c="dimmed"
+                      style={{
+                        overflow: "hidden",
+                        display: "-webkit-box",
+                        WebkitLineClamp: 4,
+                        WebkitBoxOrient: "vertical",
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {event.description
+                        ? parse(event.description)
+                        : event.description}
+                    </Box>
                   </div>
 
                   <Stack gap="md">
@@ -324,7 +337,7 @@ export const EventPage = () => {
                             Organizer
                           </Text>
                           <Text size="sm" c="dimmed">
-                            {event.organizer}
+                            {event.organizerName}
                           </Text>
                         </div>
                       </Group>
@@ -367,80 +380,8 @@ export const EventPage = () => {
             }}
           />
 
-          {/* Ticket Types */}
-          <div>
-            <Title
-              order={2}
-              mb="xl"
-              ta="center"
-              style={{
-                background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                fontSize: "2.5rem",
-                fontWeight: 800,
-              }}
-            >
-              NFT Ticket Collection
-            </Title>
-
-            {!event.ticketTypes || event.ticketTypes.length === 0 ? (
-              <Center>
-                <Card
-                  withBorder
-                  padding="xl"
-                  ta="center"
-                  radius="xl"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)",
-                    border: "1px solid rgba(59, 130, 246, 0.1)",
-                    maxWidth: "500px",
-                    width: "100%",
-                  }}
-                >
-                  <Stack align="center" gap="lg">
-                    <Box
-                      style={{
-                        background:
-                          "linear-gradient(135deg, #64748b 0%, #94a3b8 100%)",
-                        borderRadius: "50%",
-                        padding: "24px",
-                      }}
-                    >
-                      <IconTicket size={48} color="white" />
-                    </Box>
-                    <Text size="xl" fw={600}>
-                      No Ticket Types Available
-                    </Text>
-                    <Text size="md" c="dimmed">
-                      Ticket sales may not have started yet or have ended
-                    </Text>
-                  </Stack>
-                </Card>
-              </Center>
-            ) : (
-              <Grid gutter="xl">
-                {event.ticketTypes.map((ticketType) => (
-                  <Grid.Col key={ticketType.id} span={{ base: 12, md: 6 }}>
-                    <TicketPurchaseForm
-                      event={event}
-                      ticketType={ticketType}
-                      onSuccess={() => {
-                        refetch();
-                        notifications.show({
-                          title: "Success!",
-                          message:
-                            "Your NFT tickets have been minted successfully",
-                          color: "green",
-                        });
-                      }}
-                    />
-                  </Grid.Col>
-                ))}
-              </Grid>
-            )}
-          </div>
+          {/* Ticket Accordion */}
+          <TicketAccordion event={event} />
 
           {/* Event Details */}
           <Card
@@ -466,9 +407,9 @@ export const EventPage = () => {
             >
               About This Experience
             </Title>
-            <Text size="lg" style={{ whiteSpace: "pre-wrap", lineHeight: 1.7 }}>
-              {event.description}
-            </Text>
+            <Box size="lg" style={{ whiteSpace: "pre-wrap", lineHeight: 1.7 }}>
+              {event.description ? parse(event.description) : event.description}
+            </Box>
           </Card>
 
           {/* Terms */}

@@ -7,6 +7,7 @@ import { HomePage } from "./pages/HomePage";
 import { EventPage } from "./pages/EventPage";
 import { MyTicketsPage } from "./pages/MyTicketsPage";
 import { CreateEventPage } from "./pages/CreateEventPage";
+import { TicketPurchasePage } from "./pages/TicketPurchasePage";
 import { useWallet } from "./hooks/useWallet";
 
 function App() {
@@ -199,6 +200,10 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/events/:id" element={<EventPage />} />
+          <Route
+            path="/events/:eventId/purchase/:ticketTypeId"
+            element={<TicketPurchasePage />}
+          />
           <Route path="/my-tickets" element={<MyTicketsPage />} />
           <Route path="/admin/create-event" element={<CreateEventPage />} />
           <Route

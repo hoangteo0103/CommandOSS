@@ -53,7 +53,7 @@ export const HomePage = () => {
 
   const filteredEvents = events.filter(
     (event) =>
-      event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       event.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       event.location.toLowerCase().includes(searchQuery.toLowerCase())
   );

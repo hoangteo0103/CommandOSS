@@ -36,6 +36,9 @@ interface EventFormData {
   logoUrl: string;
   bannerUrl: string;
   location: string;
+  latitude: number | null;
+  longitude: number | null;
+  placeId: string;
   description: string;
   categories: string[];
   organizerName: string;
@@ -156,6 +159,9 @@ export const EventDetailsStep: React.FC<EventDetailsStepProps> = ({
 
   const handlePlaceSelect = (place: PlaceDetails) => {
     form.setFieldValue("location", place.formattedAddress);
+    form.setFieldValue("latitude", place.latitude);
+    form.setFieldValue("longitude", place.longitude);
+    form.setFieldValue("placeId", place.placeId);
   };
 
   return (

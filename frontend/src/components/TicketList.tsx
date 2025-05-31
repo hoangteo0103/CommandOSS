@@ -70,8 +70,8 @@ export const TicketList = ({ tickets, isLoading = false }: TicketListProps) => {
         <Card key={ticket.id} withBorder padding="lg">
           <Group align="flex-start" gap="md">
             <Image
-              src={ticket.event?.imageUrl}
-              alt={ticket.event?.title}
+              src={ticket.event?.bannerUrl || ticket.event?.logoUrl}
+              alt={ticket.event?.name}
               width={120}
               height={120}
               radius="md"
@@ -82,7 +82,7 @@ export const TicketList = ({ tickets, isLoading = false }: TicketListProps) => {
               <Group justify="space-between" align="flex-start">
                 <div>
                   <Text fw={600} size="lg" lineClamp={2}>
-                    {ticket.event?.title}
+                    {ticket.event?.name}
                   </Text>
                   <Text size="sm" c="dimmed">
                     {ticket.ticketType?.name}

@@ -28,14 +28,15 @@ import {
 } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
 import { eventsApi } from "../services/api";
-import type { ApiResponse } from "../types";
 import { EventDetailsStep } from "../components/EventDetailsStep";
 import { TicketConfigurationStep } from "../components/TicketConfigurationStep";
 
 interface TicketType {
+  id: string;
   name: string;
   price: number;
   supply: number;
+  availableSupply: number;
   description: string;
 }
 
@@ -46,6 +47,9 @@ interface EventFormData {
   logoUrl: string;
   bannerUrl: string;
   location: string;
+  latitude: number | null;
+  longitude: number | null;
+  placeId: string;
   description: string;
   categories: string[];
   organizerName: string;
@@ -68,15 +72,20 @@ export const CreateEventPage = () => {
       logoUrl: "",
       bannerUrl: "",
       location: "",
+      latitude: null,
+      longitude: null,
+      placeId: "",
       description: "",
       categories: [],
       organizerName: "",
       date: "",
       ticketTypes: [
         {
+          id: crypto.randomUUID(),
           name: "General Admission",
           price: 0,
           supply: 100,
+          availableSupply: 100,
           description: "",
         },
       ],
@@ -121,7 +130,14 @@ export const CreateEventPage = () => {
   const addTicketType = () => {
     form.setFieldValue("ticketTypes", [
       ...form.values.ticketTypes,
-      { name: "", price: 0, supply: 100, description: "" },
+      {
+        id: crypto.randomUUID(),
+        name: "",
+        price: 0,
+        supply: 100,
+        availableSupply: 100,
+        description: "",
+      },
     ]);
   };
 
@@ -140,6 +156,9 @@ export const CreateEventPage = () => {
     value: any
   ) => {
     const newTicketTypes = [...form.values.ticketTypes];
+    if (field === "supply") {
+      newTicketTypes[index].availableSupply = value;
+    }
     newTicketTypes[index] = { ...newTicketTypes[index], [field]: value };
     form.setFieldValue("ticketTypes", newTicketTypes);
   };
@@ -171,19 +190,19 @@ export const CreateEventPage = () => {
       return;
     }
 
-    // Create the form data to match backend API format
     const formData = {
-      title: form.values.name,
+      name: form.values.name,
       description: form.values.description,
       date: form.values.date,
       location: form.values.location,
-      organizer: form.values.organizerName,
-      imageUrl: form.values.logoUrl || form.values.bannerUrl || "",
-      // Additional fields that our form has but backend might not expect yet
-      categories: form.values.categories,
-      ticketTypes: form.values.ticketTypes,
+      latitude: form.values.latitude,
+      longitude: form.values.longitude,
+      placeId: form.values.placeId,
+      organizerName: form.values.organizerName,
       logoUrl: form.values.logoUrl,
       bannerUrl: form.values.bannerUrl,
+      categories: form.values.categories,
+      ticketTypes: form.values.ticketTypes,
     };
 
     createEventMutation.mutate(formData);

@@ -151,34 +151,289 @@ export const ticketTypesApi = {
   },
 };
 
-// Orders API
+// Booking API (Updated to match BookingController)
+export const bookingApi = {
+  // Reserve tickets (15-minute hold)
+  reserveTickets: async (
+    data: ReserveTicketRequest
+  ): Promise<
+    ApiResponse<{
+      id: string;
+      eventId: string;
+      ticketTypeId: string;
+      quantity: number;
+      buyerAddress: string;
+      expiresAt: string;
+      status: string;
+      totalPrice: number;
+      createdAt: string;
+    }>
+  > => {
+    const response = await api.post("/booking/reserve", data);
+    return response.data;
+  },
+
+  // Complete purchase and mint NFTs
+  purchaseTickets: async (
+    data: PurchaseTicketRequest
+  ): Promise<
+    ApiResponse<{
+      orderId: string;
+      transactionHash: string;
+      nftTokenIds: string[];
+      status: string;
+      mintedAt: string;
+    }>
+  > => {
+    const response = await api.post("/booking/purchase", data);
+    return response.data;
+  },
+
+  // Get reservation details
+  getReservation: async (
+    reservationId: string
+  ): Promise<
+    ApiResponse<{
+      id: string;
+      status: string;
+      expiresAt: string;
+      timeLeft: number;
+      tickets: {
+        eventName: string;
+        ticketTypeName: string;
+        quantity: number;
+        unitPrice: number;
+        totalPrice: number;
+      };
+    }>
+  > => {
+    const response = await api.get(`/booking/reserve/${reservationId}`);
+    return response.data;
+  },
+
+  // Cancel reservation
+  cancelReservation: async (
+    reservationId: string
+  ): Promise<ApiResponse<void>> => {
+    const response = await api.delete(`/booking/reserve/${reservationId}`);
+    return response.data;
+  },
+
+  // Get user's booking history
+  getUserBookings: async (
+    walletAddress: string,
+    options?: {
+      status?: string;
+      limit?: number;
+      offset?: number;
+    }
+  ): Promise<
+    ApiResponse<{
+      bookings: any[];
+      total: number;
+      offset: number;
+      limit: number;
+    }>
+  > => {
+    const params = new URLSearchParams();
+    if (options?.status) params.append("status", options.status);
+    if (options?.limit) params.append("limit", options.limit.toString());
+    if (options?.offset) params.append("offset", options.offset.toString());
+
+    const queryString = params.toString();
+    const url = `/booking/user/${walletAddress}${
+      queryString ? `?${queryString}` : ""
+    }`;
+
+    const response = await api.get(url);
+    return response.data;
+  },
+
+  // Check ticket availability
+  checkAvailability: async (
+    eventId: string,
+    ticketTypeId: string
+  ): Promise<
+    ApiResponse<{
+      availableTickets: number;
+      totalTickets: number;
+      reservedTickets: number;
+      soldTickets: number;
+      isAvailable: boolean;
+      pricePerTicket: number;
+    }>
+  > => {
+    const response = await api.get(
+      `/booking/availability/${eventId}/${ticketTypeId}`
+    );
+    return response.data;
+  },
+
+  // Admin: Get all bookings
+  getAllBookings: async (options?: {
+    eventId?: string;
+    status?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<
+    ApiResponse<{
+      bookings: any[];
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+    }>
+  > => {
+    const params = new URLSearchParams();
+    if (options?.eventId) params.append("eventId", options.eventId);
+    if (options?.status) params.append("status", options.status);
+    if (options?.page) params.append("page", options.page.toString());
+    if (options?.limit) params.append("limit", options.limit.toString());
+
+    const queryString = params.toString();
+    const url = `/booking/admin/all${queryString ? `?${queryString}` : ""}`;
+
+    const response = await api.get(url);
+    return response.data;
+  },
+
+  // Admin: Cleanup expired reservations
+  cleanupExpiredReservations: async (): Promise<
+    ApiResponse<{
+      cleanedReservations: number;
+      timestamp: string;
+    }>
+  > => {
+    const response = await api.post("/booking/admin/cleanup-expired");
+    return response.data;
+  },
+};
+
+// Legacy Orders API (for backward compatibility)
 export const ordersApi = {
-  // Reserve tickets (creates pending order)
+  // Reserve tickets (creates pending order) - Legacy wrapper
   reserveTickets: async (
     data: ReserveTicketRequest
   ): Promise<ApiResponse<Order>> => {
-    const response = await api.post("/reserve", data);
-    return response.data;
+    const response = await bookingApi.reserveTickets(data);
+
+    // Transform the new booking response to match the old Order interface
+    if (response.success && response.data) {
+      const bookingData = response.data;
+      const orderData: Order = {
+        id: bookingData.id,
+        eventId: bookingData.eventId,
+        ticketTypeId: bookingData.ticketTypeId,
+        buyerAddress: bookingData.buyerAddress,
+        quantity: bookingData.quantity,
+        totalPrice: bookingData.totalPrice,
+        status: bookingData.status as
+          | "pending"
+          | "confirmed"
+          | "failed"
+          | "cancelled",
+        createdAt: bookingData.createdAt,
+        updatedAt: bookingData.createdAt, // Use createdAt as updatedAt for now
+      };
+
+      return {
+        success: true,
+        data: orderData,
+        message: response.message,
+      };
+    }
+
+    return response as any;
   },
 
-  // Purchase tickets (confirms order and mints NFTs)
+  // Purchase tickets (confirms order and mints NFTs) - Legacy wrapper
   purchaseTickets: async (
     data: PurchaseTicketRequest
   ): Promise<ApiResponse<Order>> => {
-    const response = await api.post("/purchase", data);
-    return response.data;
+    const response = await bookingApi.purchaseTickets(data);
+
+    // Transform the new booking response to match the old Order interface
+    if (response.success && response.data) {
+      const purchaseData = response.data;
+      const orderData: Order = {
+        id: purchaseData.orderId,
+        eventId: "", // Would need to fetch this from reservation
+        ticketTypeId: "", // Would need to fetch this from reservation
+        buyerAddress: "", // Would need to fetch this from reservation
+        quantity: 0, // Would need to fetch this from reservation
+        totalPrice: 0, // Would need to fetch this from reservation
+        status: "confirmed",
+        createdAt: purchaseData.mintedAt,
+        updatedAt: purchaseData.mintedAt,
+      };
+
+      return {
+        success: true,
+        data: orderData,
+        message: response.message,
+      };
+    }
+
+    return response as any;
   },
 
-  // Get user's orders
+  // Get user's orders - Legacy wrapper
   getMyOrders: async (userAddress: string): Promise<ApiResponse<Order[]>> => {
-    const response = await api.get(`/orders/user/${userAddress}`);
-    return response.data;
+    const response = await bookingApi.getUserBookings(userAddress);
+
+    if (response.success && response.data) {
+      const orders: Order[] = response.data.bookings.map((booking: any) => ({
+        id: booking.id,
+        eventId: booking.eventId,
+        ticketTypeId: booking.ticketTypeId,
+        buyerAddress: booking.buyerAddress,
+        quantity: booking.quantity,
+        totalPrice: booking.totalPrice,
+        status: booking.status,
+        createdAt: booking.createdAt,
+        updatedAt: booking.createdAt,
+      }));
+
+      return {
+        success: true,
+        data: orders,
+        message: response.message,
+      };
+    }
+
+    return response as any;
   },
 
-  // Get order by ID
+  // Get order by ID - Legacy wrapper
   getOrder: async (id: string): Promise<ApiResponse<Order>> => {
-    const response = await api.get(`/orders/${id}`);
-    return response.data;
+    const response = await bookingApi.getReservation(id);
+
+    if (response.success && response.data) {
+      const reservationData = response.data;
+      const orderData: Order = {
+        id: reservationData.id,
+        eventId: "", // Not available in reservation response
+        ticketTypeId: "", // Not available in reservation response
+        buyerAddress: "", // Not available in reservation response
+        quantity: reservationData.tickets.quantity,
+        totalPrice: reservationData.tickets.totalPrice,
+        status: reservationData.status as
+          | "pending"
+          | "confirmed"
+          | "failed"
+          | "cancelled",
+        createdAt: "", // Not available in reservation response
+        updatedAt: "", // Not available in reservation response
+      };
+
+      return {
+        success: true,
+        data: orderData,
+        message: response.message,
+      };
+    }
+
+    return response as any;
   },
 };
 

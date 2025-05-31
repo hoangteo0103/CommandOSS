@@ -24,6 +24,7 @@ import {
 } from "@tabler/icons-react";
 
 interface TicketType {
+  id: string;
   name: string;
   price: number;
   supply: number;

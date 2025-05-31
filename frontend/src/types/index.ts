@@ -1,16 +1,22 @@
 export interface Event {
   id: string;
-  title: string;
+  name: string;
   description: string;
   date: string;
   location: string;
-  imageUrl?: string;
-  organizer: string;
+  latitude?: number;
+  longitude?: number;
+  placeId?: string;
+  logoUrl?: string;
+  bannerUrl?: string;
+  organizerName: string;
+  categories: string[];
   totalTickets: number;
   availableTickets: number;
+  status: string;
   createdAt: string;
   updatedAt: string;
-  ticketTypes: TicketType[];
+  ticketTypes?: TicketType[];
 }
 
 export interface TicketType {
@@ -19,7 +25,7 @@ export interface TicketType {
   name: string;
   description?: string;
   price: number;
-  totalSupply: number;
+  supply: number;
   availableSupply: number;
   saleStartDate: string;
   saleEndDate: string;
@@ -69,12 +75,17 @@ export interface PaginatedResponse<T> {
 }
 
 export interface CreateEventRequest {
-  title: string;
+  name: string;
   description: string;
   date: string;
   location: string;
-  imageUrl?: string;
-  organizer: string;
+  latitude?: number;
+  longitude?: number;
+  placeId?: string;
+  logoUrl?: string;
+  bannerUrl?: string;
+  organizerName: string;
+  categories: string[];
 }
 
 export interface CreateTicketTypeRequest {

@@ -91,9 +91,9 @@ export const EventCard = ({ event }: EventCardProps) => {
 
       <Card.Section style={{ position: "relative" }}>
         <Image
-          src={event.imageUrl || "/placeholder-event.jpg"}
+          src={event.bannerUrl || event.logoUrl || "/placeholder-event.jpg"}
           height={220}
-          alt={event.title}
+          alt={event.name}
           fallbackSrc="https://placehold.co/400x220/1e293b/64748b?text=Future+Event"
           style={{
             filter: "brightness(0.9) contrast(1.1)",
@@ -148,13 +148,35 @@ export const EventCard = ({ event }: EventCardProps) => {
               fontSize: "1.1rem",
             }}
           >
-            {event.title}
+            {event.name}
           </Text>
         </Group>
 
         <Text size="sm" c="dimmed" lineClamp={2} opacity={0.8}>
           {event.description}
         </Text>
+
+        {/* Categories */}
+        {event.categories && event.categories.length > 0 && (
+          <Group gap="xs">
+            {event.categories.slice(0, 2).map((category) => (
+              <Badge
+                key={category}
+                size="xs"
+                variant="light"
+                color="blue"
+                style={{ textTransform: "none" }}
+              >
+                {category}
+              </Badge>
+            ))}
+            {event.categories.length > 2 && (
+              <Badge size="xs" variant="outline" color="gray">
+                +{event.categories.length - 2}
+              </Badge>
+            )}
+          </Group>
+        )}
 
         {/* Futuristic Info Grid */}
         <Stack gap="xs">
@@ -206,7 +228,7 @@ export const EventCard = ({ event }: EventCardProps) => {
               <Group gap="xs">
                 <IconUsers size={14} color="#8b5cf6" />
                 <Text size="xs" fw={500} c="violet">
-                  {event.organizer}
+                  {event.organizerName}
                 </Text>
               </Group>
             </Box>

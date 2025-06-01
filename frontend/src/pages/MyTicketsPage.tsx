@@ -138,7 +138,7 @@ export const MyTicketsPage = () => {
   ).length;
   const usedCount = tickets.filter((t) => t.isUsed).length;
   const totalValue = (tickets || []).reduce(
-    (sum, ticket) => sum + (ticket?.price || 0),
+    (sum, ticket) => sum + (parseFloat(ticket?.price?.toString() || "0") || 0),
     0
   );
 

@@ -143,6 +143,7 @@ export const MyTicketsPage = () => {
   };
 
   const handleSellTicket = (ticket: any) => {
+    console.log("handleSellTicket", ticket);
     // TODO: Implement sell functionality
     notifications.show({
       title: "🔥 List for Sale",

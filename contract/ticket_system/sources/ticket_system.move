@@ -63,7 +63,7 @@ module ticket_system::ticket_system {
         ticket.used = true;
     }
 
-    /// Transfer ticket to another address (new feature)
+    /// Transfer ticket to another address
     public entry fun transfer_ticket(
         mut ticket: Ticket,
         new_owner: address,
@@ -81,12 +81,6 @@ module ticket_system::ticket_system {
         ticket: &Ticket,
         _ctx: &mut TxContext
     ) {
-        // This function exists purely to expose ticket data to off-chain callers
-        // The actual data reading happens through sui::object inspection
-        // This is a workaround since Sui doesn't support view functions yet
-        
-        // The data can be accessed by calling this function and inspecting
-        // the transaction effects or by using client.getObject() directly
     }
 
     /// Traditional getter for on-chain use (kept for compatibility)

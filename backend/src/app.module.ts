@@ -8,6 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { BookingModule } from './booking/booking.module';
 import { TicketsModule } from './tickets/tickets.module';
+import { MarketplaceModule } from './marketplace/marketplace.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { TicketsModule } from './tickets/tickets.module';
     }),
     BookingModule,
     TicketsModule,
+    MarketplaceModule,
   ],
   controllers: [AppController],
   providers: [AppService],

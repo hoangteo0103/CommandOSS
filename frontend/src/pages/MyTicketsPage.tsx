@@ -52,6 +52,7 @@ import {
   IconCopy,
   IconFingerprint,
   IconCoin,
+  IconCurrencyDollar,
 } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
 import { WalletButton } from "../components/WalletButton";
@@ -137,6 +138,16 @@ export const MyTicketsPage = () => {
       title: "🎉 Shared!",
       message: "Ticket link copied to clipboard",
       color: "green",
+      autoClose: 3000,
+    });
+  };
+
+  const handleSellTicket = (ticket: any) => {
+    // TODO: Implement sell functionality
+    notifications.show({
+      title: "🔥 List for Sale",
+      message: "Marketplace listing coming soon!",
+      color: "orange",
       autoClose: 3000,
     });
   };
@@ -699,6 +710,7 @@ export const MyTicketsPage = () => {
                         ticket={ticket}
                         onView={() => handleTicketView(ticket)}
                         onShare={() => handleShare(ticket)}
+                        onSell={() => handleSellTicket(ticket)}
                         index={index}
                       />
                     ))}
@@ -720,6 +732,7 @@ export const MyTicketsPage = () => {
                           ticket={ticket}
                           onView={() => handleTicketView(ticket)}
                           onShare={() => handleShare(ticket)}
+                          onSell={() => handleSellTicket(ticket)}
                           index={index}
                         />
                       ))}
@@ -742,6 +755,7 @@ export const MyTicketsPage = () => {
                           ticket={ticket}
                           onView={() => handleTicketView(ticket)}
                           onShare={() => handleShare(ticket)}
+                          onSell={() => handleSellTicket(ticket)}
                           index={index}
                         />
                       ))}
@@ -764,6 +778,7 @@ export const MyTicketsPage = () => {
                           ticket={ticket}
                           onView={() => handleTicketView(ticket)}
                           onShare={() => handleShare(ticket)}
+                          onSell={() => handleSellTicket(ticket)}
                           index={index}
                         />
                       ))}
@@ -830,7 +845,7 @@ export const MyTicketsPage = () => {
 };
 
 // Enhanced Ticket Card Component
-const TicketCard = ({ ticket, onView, onShare }: any) => {
+const TicketCard = ({ ticket, onView, onShare, onSell }: any) => {
   const isUpcoming = ticket.event && new Date(ticket.event.date) > new Date();
   const [miniQrCode, setMiniQrCode] = useState<string>("");
   useEffect(() => {
@@ -929,15 +944,18 @@ const TicketCard = ({ ticket, onView, onShare }: any) => {
                 >
                   <IconShare size={14} />
                 </ActionIcon>
-                {/* <ActionIcon
-                  variant="light"
-                  color="white"
-                  size="sm"
-                  radius="xl"
-                  onClick={() => onView()}
-                >
-                  <IconEye size={14} />
-                </ActionIcon> */}
+                {!ticket.isUsed && (
+                  <ActionIcon
+                    variant="light"
+                    color="white"
+                    size="sm"
+                    radius="xl"
+                    onClick={() => onSell()}
+                    title="List for Sale"
+                  >
+                    <IconCurrencyDollar size={14} />
+                  </ActionIcon>
+                )}
               </Group>
             </Group>
 

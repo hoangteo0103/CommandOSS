@@ -1,11 +1,17 @@
 import { Routes, Route } from "react-router-dom";
 import { AppShell, Group, Title, Button, Text, Box, Flex } from "@mantine/core";
-import { IconHome, IconWallet, IconHexagon3d } from "@tabler/icons-react";
+import {
+  IconHome,
+  IconWallet,
+  IconHexagon3d,
+  IconShoppingCart,
+} from "@tabler/icons-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { WalletButton } from "./components/WalletButton";
 import { HomePage } from "./pages/HomePage";
 import { EventPage } from "./pages/EventPage";
 import { MyTicketsPage } from "./pages/MyTicketsPage";
+import { MarketplacePage } from "./pages/MarketplacePage";
 import { CreateEventPage } from "./pages/CreateEventPage";
 import { EditEventPage } from "./pages/EditEventPage";
 import { CheckInPage } from "./pages/CheckInPage";
@@ -170,6 +176,28 @@ function App() {
                 </Button>
               )}
 
+              {isConnected && (
+                <Button
+                  variant={
+                    location.pathname === "/marketplace" ? "gradient" : "subtle"
+                  }
+                  gradient={{ from: "orange", to: "red", deg: 45 }}
+                  leftSection={<IconShoppingCart size={16} />}
+                  onClick={() => navigate("/marketplace")}
+                  size="md"
+                  radius="xl"
+                  style={{
+                    transition: "all 0.3s ease",
+                    ...(location.pathname !== "/marketplace" && {
+                      backgroundColor: "rgba(251, 146, 60, 0.1)",
+                      border: "1px solid rgba(251, 146, 60, 0.2)",
+                    }),
+                  }}
+                >
+                  Marketplace
+                </Button>
+              )}
+
               <WalletButton />
             </Group>
           </Flex>
@@ -261,6 +289,7 @@ function App() {
             element={<TicketPurchasePage />}
           />
           <Route path="/my-tickets" element={<MyTicketsPage />} />
+          <Route path="/marketplace" element={<MarketplacePage />} />
           <Route path="/admin/create-event" element={<CreateEventPage />} />
           <Route
             path="*"

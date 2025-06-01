@@ -536,12 +536,6 @@ const SearchPageContent = () => {
             {adjustedEventsWithCoordinates.map((event, index) => {
               // Debug logging (remove in production)
               if (process.env.NODE_ENV === "development") {
-                console.log(`Rendering marker ${index} for event:`, {
-                  id: event.id,
-                  name: event.name,
-                  lat: event.offsetLat,
-                  lng: event.offsetLng,
-                });
               }
 
               return (

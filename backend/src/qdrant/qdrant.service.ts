@@ -36,11 +36,18 @@ export class QdrantService implements OnModuleInit {
       const content = this.createEventText(event);
       const embedding = await this.embeddingService.generateEmbedding(content);
 
-      // Prepare location data
+      // Prepare location data - ensure coordinates are numbers
+      const latitude = event.latitude
+        ? parseFloat(event.latitude.toString())
+        : null;
+      const longitude = event.longitude
+        ? parseFloat(event.longitude.toString())
+        : null;
+
       const location =
-        event.latitude && event.longitude
-          ? { lat: event.latitude, lon: event.longitude }
-          : null;
+        latitude && longitude ? { lat: latitude, lon: longitude } : null;
+
+      console.log(`Indexing event ${event.id} with location:`, location);
 
       // Create payload with proper structure
       const payload = {
@@ -51,8 +58,8 @@ export class QdrantService implements OnModuleInit {
         eventDescription: event.description, // Compatibility
         location: event.location, // Location string
         formattedAddress: event.location,
-        latitude: event.latitude,
-        longitude: event.longitude,
+        latitude: latitude,
+        longitude: longitude,
         placeId: event.placeId,
         organizerName: event.organizerName,
         date: event.date.toISOString(),
@@ -84,7 +91,10 @@ export class QdrantService implements OnModuleInit {
         points: [point],
       });
 
-      console.log(`Event indexed in Qdrant: ${event.id}`);
+      console.log(
+        `Event indexed in Qdrant: ${event.id} with geoLocation:`,
+        location,
+      );
     } catch (error) {
       console.error(`Failed to index event ${event.id}:`, error);
       throw error;

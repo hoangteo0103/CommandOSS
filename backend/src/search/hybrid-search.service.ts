@@ -52,10 +52,14 @@ export class HybridSearchService {
     // Build query filter
     const queryFilter = this.buildQueryFilter(filters);
 
+    console.log(`Search request: query="${query}", filters=`, filters);
+    console.log(`Built query filter:`, JSON.stringify(queryFilter, null, 2));
+
     let searchResult;
 
     if (query && query.trim()) {
       // Semantic search with query text
+      console.log('Performing semantic search with query:', query);
       const embedding = await this.embeddingService.generateEmbedding(query);
 
       searchResult = await this.client.search(EVENTS_COLLECTION_NAME, {
@@ -69,17 +73,39 @@ export class HybridSearchService {
         with_payload: true,
         score_threshold: this.scoreThreshold,
       });
+
+      console.log(`Semantic search returned ${searchResult.length} results`);
     } else {
       // Filter-only search (no semantic query)
-      searchResult = await this.client.scroll(EVENTS_COLLECTION_NAME, {
+      console.log('Performing filter-only search');
+      const scrollResult = await this.client.scroll(EVENTS_COLLECTION_NAME, {
         filter: queryFilter,
         limit,
         offset,
         with_payload: true,
       });
 
+      console.log(
+        'Scroll result structure:',
+        typeof scrollResult,
+        Object.keys(scrollResult || {}),
+      );
+
+      // Handle different Qdrant client versions
+      let points;
+      if (scrollResult && 'points' in scrollResult) {
+        points = (scrollResult as any).points;
+      } else if (Array.isArray(scrollResult)) {
+        points = scrollResult;
+      } else {
+        console.log('Unexpected scroll result format:', scrollResult);
+        points = [];
+      }
+
+      console.log(`Filter-only search returned ${points.length} points`);
+
       // Convert scroll result to search result format
-      searchResult = searchResult.points.map((point) => ({
+      searchResult = points.map((point) => ({
         id: point.id,
         score: 1.0, // No score for filter-only
         payload: point.payload,
@@ -90,6 +116,8 @@ export class HybridSearchService {
     const events = searchResult.map((hit) =>
       this.convertPayloadToEvent(hit.payload as any),
     );
+
+    console.log(`Converted to ${events.length} events`);
 
     return {
       events,
@@ -123,14 +151,6 @@ export class HybridSearchService {
 
   private buildQueryFilter(filters: SearchFilters): any {
     const conditions: any[] = [];
-
-    // City filter
-    if (filters.city) {
-      conditions.push({
-        key: 'city',
-        match: { value: filters.city.toLowerCase() },
-      });
-    }
 
     // Categories filter
     if (filters.categories && filters.categories.length > 0) {
@@ -176,9 +196,9 @@ export class HybridSearchService {
       });
     }
 
-    // Geo bounding box filter
+    // Geo bounding box filter - following Python implementation pattern
     if (filters.minLat && filters.maxLat && filters.minLon && filters.maxLon) {
-      conditions.push({
+      const geoCondition = {
         key: 'geoLocation',
         geo_bounding_box: {
           top_left: {
@@ -190,10 +210,20 @@ export class HybridSearchService {
             lon: filters.maxLon,
           },
         },
-      });
+      };
+
+      conditions.push(geoCondition);
+      console.log(
+        'Added geo condition:',
+        JSON.stringify(geoCondition, null, 2),
+      );
     }
 
-    return conditions.length > 0 ? { must: conditions } : undefined;
+    const finalFilter =
+      conditions.length > 0 ? { must: conditions } : undefined;
+    console.log('Final filter conditions count:', conditions.length);
+
+    return finalFilter;
   }
 
   private convertPayloadToEvent(payload: any): Event {
@@ -229,8 +259,18 @@ export class HybridSearchService {
         with_payload: true,
       });
 
-      if (result[0] && result[0].length > 0) {
-        return this.convertPayloadToEvent(result[0][0].payload as any);
+      // Handle different result formats
+      let points;
+      if (result && 'points' in result) {
+        points = (result as any).points;
+      } else if (Array.isArray(result)) {
+        points = result;
+      } else {
+        points = [];
+      }
+
+      if (points && points.length > 0) {
+        return this.convertPayloadToEvent(points[0].payload as any);
       }
 
       return null;

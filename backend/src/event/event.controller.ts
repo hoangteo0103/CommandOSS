@@ -157,57 +157,6 @@ export class EventController {
     };
   }
 
-  @Get('search/location')
-  async searchByLocation(
-    @Query('lat') latitude: string,
-    @Query('lng') longitude: string,
-    @Query('radius') radius?: string,
-    @Query('limit') limit?: string,
-    @Query('q') query?: string,
-  ) {
-    if (!latitude || !longitude) {
-      return {
-        success: false,
-        data: [],
-        message: 'Latitude and longitude parameters are required',
-      };
-    }
-
-    const lat = parseFloat(latitude);
-    const lng = parseFloat(longitude);
-    const radiusKm = radius ? parseFloat(radius) : 10;
-    const limitNum = limit ? parseInt(limit, 10) : 20;
-
-    if (isNaN(lat) || isNaN(lng)) {
-      return {
-        success: false,
-        data: [],
-        message: 'Invalid latitude or longitude values',
-      };
-    }
-
-    try {
-      const result = await this.eventService.searchEventsByLocation(
-        lat,
-        lng,
-        radiusKm,
-        limitNum,
-      );
-
-      return {
-        success: true,
-        data: result,
-        message: `Found ${result.length} events within ${radiusKm}km`,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        data: [],
-        message: 'Location search failed',
-      };
-    }
-  }
-
   @Get(':id')
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
     const event = await this.eventService.findOne(id);

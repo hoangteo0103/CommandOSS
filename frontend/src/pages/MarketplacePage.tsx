@@ -65,9 +65,9 @@ export const MarketplacePage = () => {
   // Fetch marketplace listings
   const {
     data: listingsResponse,
-    isLoading,
-    error,
-    refetch,
+    // isLoading,
+    // error,
+    // refetch,
   } = useQuery({
     queryKey: ["marketplace-listings", searchQuery, categoryFilter, sortBy],
     queryFn: () => {
@@ -371,7 +371,7 @@ export const MarketplacePage = () => {
               </Center>
             ) : (
               <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
-                {listings.map((listing) => (
+                {listings.map((listing: MarketplaceListing) => (
                   <MarketplaceListingCard
                     key={listing.id}
                     listing={listing}

@@ -168,12 +168,6 @@ export const TicketPurchasePage = () => {
 
         queryClient.invalidateQueries({ queryKey: ["event", eventId] });
         queryClient.invalidateQueries({ queryKey: ["my-tickets"] });
-
-        setTimeout(() => {
-          navigate(`/events/${eventId}`, {
-            state: { purchaseSuccess: true },
-          });
-        }, 3000);
       }
       setIsProcessing(false);
     },

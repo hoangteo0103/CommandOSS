@@ -930,7 +930,7 @@ const TicketCard = ({ ticket, onView, onShare }: any) => {
                 >
                   <IconShare size={14} />
                 </ActionIcon>
-                <ActionIcon
+                {/* <ActionIcon
                   variant="light"
                   color="white"
                   size="sm"
@@ -938,7 +938,7 @@ const TicketCard = ({ ticket, onView, onShare }: any) => {
                   onClick={() => onView()}
                 >
                   <IconEye size={14} />
-                </ActionIcon>
+                </ActionIcon> */}
               </Group>
             </Group>
 

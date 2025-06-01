@@ -2,6 +2,10 @@
 
 A decentralized marketplace for buying and selling NFT event tickets built on the Sui blockchain. This platform enables secure peer-to-peer transactions for premium event experiences through blockchain-verified digital tickets.
 
+## 🏗️ System Architecture
+
+![Architecture Diagram](./architechture.png)
+
 ## ✨ Features
 
 ### 🎟️ Core Functionality
@@ -62,6 +66,42 @@ A decentralized marketplace for buying and selling NFT event tickets built on th
 - **PostgreSQL** for relational data
 - **Qdrant Vector DB** for semantic search and AI features
 - **Geographic Indexing** for location-based queries
+
+### Component Overview
+
+The NFT Ticket Marketplace follows a modern, microservices-inspired architecture with clear separation of concerns:
+
+#### Frontend Layer
+
+- **React Application**: User interface with wallet integration and real-time updates
+- **Map Interface**: Interactive geographic event discovery
+- **Wallet Connector**: Sui blockchain wallet integration
+
+#### Backend Services
+
+- **API Gateway**: RESTful API endpoints for all client interactions
+- **Marketplace Service**: Core business logic for ticket listings and transactions
+- **Search Service**: Integration with Qdrant for semantic and geographic search
+- **Blockchain Service**: Sui network interaction and NFT management
+
+#### Data Layer
+
+- **PostgreSQL**: Primary database for user data, events, and marketplace listings
+- **Qdrant Vector DB**: Vector embeddings for semantic search and recommendations
+- **Sui Blockchain**: Immutable NFT storage and transaction records
+
+#### External Services
+
+- **Sui Network**: Blockchain infrastructure for NFT minting and transfers
+- **Escrow Smart Contracts**: Automated transaction security
+- **Geolocation APIs**: Location-based search and mapping
+
+### Data Flow
+
+1. **Event Discovery**: Users search through semantic queries or map interface
+2. **Ticket Purchase**: Blockchain transactions with automatic escrow
+3. **NFT Transfer**: Secure transfer to buyer's wallet upon payment confirmation
+4. **Marketplace Listing**: Sellers can list tickets with escrow protection
 
 ## 🚀 Quick Start
 

@@ -313,21 +313,6 @@ export const EventPage = () => {
                     >
                       {event.name}
                     </Title>
-                    <Box
-                      size="lg"
-                      c="dimmed"
-                      style={{
-                        overflow: "hidden",
-                        display: "-webkit-box",
-                        WebkitLineClamp: 4,
-                        WebkitBoxOrient: "vertical",
-                        lineHeight: 1.5,
-                      }}
-                    >
-                      {event.description
-                        ? parse(event.description)
-                        : event.description}
-                    </Box>
                   </div>
 
                   <Stack gap="md">

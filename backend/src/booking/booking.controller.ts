@@ -121,11 +121,6 @@ export class BookingController {
     description: 'Reservation not found',
   })
   async purchaseTickets(@Body(ValidationPipe) purchaseDto: PurchaseTicketsDto) {
-    // Log incoming purchase notification
-    console.log('🔔 PURCHASE NOTIFICATION RECEIVED AT CONTROLLER:');
-    console.log('📦 Data:', JSON.stringify(purchaseDto, null, 2));
-    console.log('⏰ Timestamp:', new Date().toISOString());
-
     try {
       const purchase = await this.bookingService.completePurchase(purchaseDto);
 

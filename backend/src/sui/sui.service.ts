@@ -900,4 +900,35 @@ export class SuiService {
   getPackageId(): string {
     return this.packageId;
   }
+
+  /**
+   * Get transaction details for verification
+   */
+  async getTransactionDetails(transactionHash: string): Promise<any> {
+    try {
+      this.logger.log(
+        `🔍 Fetching transaction details for: ${transactionHash}`,
+      );
+
+      const result = await this.client.getTransactionBlock({
+        digest: transactionHash,
+        options: {
+          showEffects: true,
+          showInput: true,
+          showBalanceChanges: true,
+          showObjectChanges: true,
+        },
+      });
+
+      this.logger.log(
+        `✅ Transaction details retrieved: ${result.effects?.status?.status}`,
+      );
+      return result;
+    } catch (error) {
+      this.logger.error(
+        `❌ Failed to get transaction details: ${error.message}`,
+      );
+      throw new Error(`Failed to get transaction details: ${error.message}`);
+    }
+  }
 }

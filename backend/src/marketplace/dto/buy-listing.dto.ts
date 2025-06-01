@@ -1,13 +1,11 @@
-import { IsString, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class BuyListingDto {
-  @IsString()
-  listingId: string;
-
+  @IsNotEmpty()
   @IsString()
   buyerAddress: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  transactionHash?: string;
+  transactionHash: string; // Required - must be a real blockchain transaction
 }

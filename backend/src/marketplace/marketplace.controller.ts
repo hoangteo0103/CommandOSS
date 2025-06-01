@@ -62,16 +62,11 @@ export class MarketplaceController {
   @HttpCode(HttpStatus.OK)
   async buyListing(
     @Param('id') listingId: string,
-    @Body(ValidationPipe) buyListingDto: Omit<BuyListingDto, 'listingId'>,
+    @Body() buyListingDto: BuyListingDto,
   ) {
-    const fullBuyDto: BuyListingDto = {
-      ...buyListingDto,
-      listingId,
-    };
-
     return {
       success: true,
-      data: await this.marketplaceService.buyListing(fullBuyDto),
+      data: await this.marketplaceService.buyListing(listingId, buyListingDto),
       message: 'Purchase completed successfully',
     };
   }
@@ -133,6 +128,17 @@ export class MarketplaceController {
         { value: 'other', label: 'Other' },
       ],
       message: 'Categories retrieved successfully',
+    };
+  }
+
+  @Get('escrow-address')
+  async getEscrowAddress() {
+    return {
+      success: true,
+      data: {
+        escrowAddress: this.marketplaceService.getEscrowAddress(),
+      },
+      message: 'Escrow address retrieved successfully',
     };
   }
 }

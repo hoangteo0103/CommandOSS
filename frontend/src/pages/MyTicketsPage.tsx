@@ -27,6 +27,10 @@ import {
   Modal,
   NumberFormatter,
   CopyButton,
+  TextInput,
+  NumberInput,
+  Textarea,
+  Select,
 } from "@mantine/core";
 import {
   IconTicket,
@@ -62,6 +66,9 @@ import { notifications } from "@mantine/notifications";
 import { useDisclosure } from "@mantine/hooks";
 import dayjs from "dayjs";
 import QRCode from "qrcode";
+import { marketplaceApi } from "../services/marketplace";
+import type { CreateListingDto } from "../services/marketplace";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const MyTicketsPage = () => {
   const { isConnected, address } = useWallet();
@@ -71,7 +78,18 @@ export const MyTicketsPage = () => {
     ticketModalOpened,
     { open: openTicketModal, close: closeTicketModal },
   ] = useDisclosure(false);
+  const [sellModalOpened, { open: openSellModal, close: closeSellModal }] =
+    useDisclosure(false);
   const [showAnimation, setShowAnimation] = useState(false);
+  const [ticketToSell, setTicketToSell] = useState<any>(null);
+  const [sellForm, setSellForm] = useState({
+    listingPrice: "",
+    category: "",
+    description: "",
+    expiresAt: "",
+  });
+
+  const queryClient = useQueryClient();
 
   const {
     data: ticketsData,
@@ -144,13 +162,64 @@ export const MyTicketsPage = () => {
 
   const handleSellTicket = (ticket: any) => {
     console.log("handleSellTicket", ticket);
-    // TODO: Implement sell functionality
-    notifications.show({
-      title: "🔥 List for Sale",
-      message: "Marketplace listing coming soon!",
-      color: "orange",
-      autoClose: 3000,
+    setTicketToSell(ticket);
+    setSellForm({
+      listingPrice: ticket.price?.toString() || "",
+      category: "",
+      description: "",
+      expiresAt: "",
     });
+    openSellModal();
+  };
+
+  const handleCreateListing = () => {
+    if (!ticketToSell || !address) return;
+
+    const listingData: CreateListingDto = {
+      ticketId: ticketToSell.id,
+      sellerAddress: address,
+      listingPrice: parseFloat(sellForm.listingPrice),
+      originalPrice: ticketToSell.price || 0,
+      category: sellForm.category || undefined,
+      description: sellForm.description || undefined,
+      expiresAt: sellForm.expiresAt || undefined,
+    };
+
+    createListingMutation.mutate(listingData);
+  };
+
+  // Create listing mutation
+  const createListingMutation = useMutation({
+    mutationFn: (data: CreateListingDto) => marketplaceApi.createListing(data),
+    onSuccess: () => {
+      notifications.show({
+        title: "🎉 Listed Successfully!",
+        message: "Your ticket is now available in the marketplace",
+        color: "green",
+        autoClose: 5000,
+      });
+      closeSellModal();
+      queryClient.invalidateQueries({ queryKey: ["my-tickets"] });
+      resetSellForm();
+    },
+    onError: (error: any) => {
+      notifications.show({
+        title: "❌ Listing Failed",
+        message: error.response?.data?.message || "Failed to list ticket",
+        color: "red",
+        autoClose: 5000,
+      });
+    },
+  });
+
+  const resetSellForm = () => {
+    setSellForm({
+      listingPrice: "",
+      category: "",
+      description: "",
+      expiresAt: "",
+    });
+    setTicketToSell(null);
   };
 
   if (!isConnected) {
@@ -817,6 +886,142 @@ export const MyTicketsPage = () => {
             ticket={selectedTicket}
             onClose={closeTicketModal}
           />
+        )}
+      </Modal>
+
+      {/* Sell Ticket Modal */}
+      <Modal
+        opened={sellModalOpened}
+        onClose={closeSellModal}
+        title={
+          <Group gap="md">
+            <ThemeIcon
+              size="lg"
+              radius="xl"
+              variant="gradient"
+              gradient={{ from: "orange", to: "red", deg: 45 }}
+            >
+              <IconCurrencyDollar size={20} />
+            </ThemeIcon>
+            <Text fw={600}>List Ticket for Sale</Text>
+          </Group>
+        }
+        size="md"
+        radius="xl"
+      >
+        {ticketToSell && (
+          <Stack gap="lg">
+            {/* Ticket Info */}
+            <Card
+              p="lg"
+              radius="lg"
+              style={{ background: "rgba(251, 146, 60, 0.05)" }}
+            >
+              <Stack gap="sm">
+                <Text fw={600} size="lg">
+                  {ticketToSell.event?.name}
+                </Text>
+                <Group gap="md">
+                  <Group gap="xs">
+                    <IconCalendar size={16} />
+                    <Text size="sm">
+                      {dayjs(ticketToSell.event?.date).format("MMM DD, YYYY")}
+                    </Text>
+                  </Group>
+                  <Group gap="xs">
+                    <IconMapPin size={16} />
+                    <Text size="sm">{ticketToSell.event?.location}</Text>
+                  </Group>
+                </Group>
+                <Text size="sm" c="dimmed">
+                  Original Price: SUI {ticketToSell.price}
+                </Text>
+              </Stack>
+            </Card>
+
+            {/* Listing Form */}
+            <Stack gap="md">
+              <NumberInput
+                label="Listing Price (SUI)"
+                placeholder="Enter your desired price"
+                value={sellForm.listingPrice}
+                onChange={(value) =>
+                  setSellForm((prev) => ({
+                    ...prev,
+                    listingPrice: value?.toString() || "",
+                  }))
+                }
+                min={0.01}
+                step={0.01}
+                decimalScale={2}
+                required
+                leftSection={<IconCoin size={16} />}
+              />
+
+              <Select
+                label="Category"
+                placeholder="Select category (optional)"
+                value={sellForm.category}
+                onChange={(value) =>
+                  setSellForm((prev) => ({ ...prev, category: value || "" }))
+                }
+                data={[
+                  { value: "Technology", label: "Technology" },
+                  { value: "Art & Culture", label: "Art & Culture" },
+                  { value: "Music", label: "Music" },
+                  { value: "Finance", label: "Finance" },
+                  { value: "Sports", label: "Sports" },
+                  { value: "Other", label: "Other" },
+                ]}
+              />
+
+              <Textarea
+                label="Description"
+                placeholder="Add a description for your listing (optional)"
+                value={sellForm.description}
+                onChange={(e) =>
+                  setSellForm((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
+                maxRows={4}
+                autosize
+              />
+
+              <TextInput
+                label="Expires At"
+                placeholder="YYYY-MM-DD (optional)"
+                value={sellForm.expiresAt}
+                onChange={(e) =>
+                  setSellForm((prev) => ({
+                    ...prev,
+                    expiresAt: e.target.value,
+                  }))
+                }
+                type="date"
+              />
+            </Stack>
+
+            {/* Actions */}
+            <Group justify="center" gap="md" mt="lg">
+              <Button variant="light" onClick={closeSellModal}>
+                Cancel
+              </Button>
+              <Button
+                variant="gradient"
+                gradient={{ from: "orange", to: "red", deg: 45 }}
+                onClick={handleCreateListing}
+                loading={createListingMutation.isPending}
+                disabled={
+                  !sellForm.listingPrice ||
+                  parseFloat(sellForm.listingPrice) <= 0
+                }
+              >
+                List for Sale
+              </Button>
+            </Group>
+          </Stack>
         )}
       </Modal>
 

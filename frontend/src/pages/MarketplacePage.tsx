@@ -40,113 +40,118 @@ import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { marketplaceApi } from "../services/marketplace";
+import type {
+  MarketplaceListing,
+  MarketplaceQueryDto,
+  BuyListingDto,
+} from "../services/marketplace";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 dayjs.extend(relativeTime);
 
-// Mock marketplace data - in real app this would come from API
-const mockMarketplaceListings = [
-  {
-    id: 1,
-    nftTokenId: "0x123...abc",
-    event: {
-      name: "Blockchain Summit 2024",
-      date: "2024-04-15T19:00:00Z",
-      location: "San Francisco",
-      image: "https://via.placeholder.com/400x200?text=Blockchain+Summit",
-    },
-    originalPrice: 150,
-    listingPrice: 120,
-    seller: "0xabc...123",
-    listedAt: "2024-03-01T10:00:00Z",
-    category: "Tech",
-    isHot: true,
-  },
-  {
-    id: 2,
-    nftTokenId: "0x456...def",
-    event: {
-      name: "NFT Art Expo",
-      date: "2024-05-20T18:00:00Z",
-      location: "New York",
-      image: "https://via.placeholder.com/400x200?text=NFT+Art+Expo",
-    },
-    originalPrice: 200,
-    listingPrice: 250,
-    seller: "0xdef...456",
-    listedAt: "2024-03-05T14:30:00Z",
-    category: "Art",
-    isHot: false,
-  },
-  {
-    id: 3,
-    nftTokenId: "0x789...ghi",
-    event: {
-      name: "DeFi Conference",
-      date: "2024-06-10T09:00:00Z",
-      location: "London",
-      image: "https://via.placeholder.com/400x200?text=DeFi+Conference",
-    },
-    originalPrice: 300,
-    listingPrice: 275,
-    seller: "0xghi...789",
-    listedAt: "2024-03-10T16:45:00Z",
-    category: "Finance",
-    isHot: true,
-  },
-];
-
 export const MarketplacePage = () => {
-  const { isConnected } = useWallet();
+  const { isConnected, address } = useWallet();
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [categoryFilter, setCategoryFilter] = useState("all");
-  const [selectedListing, setSelectedListing] = useState<any>(null);
+  const [selectedListing, setSelectedListing] =
+    useState<MarketplaceListing | null>(null);
   const [buyModalOpened, { open: openBuyModal, close: closeBuyModal }] =
     useDisclosure(false);
 
-  // Filter and sort listings
-  const filteredListings = mockMarketplaceListings
-    .filter((listing) => {
-      const matchesSearch = listing.event.name
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-      const matchesCategory =
-        categoryFilter === "all" ||
-        listing.category.toLowerCase() === categoryFilter;
-      return matchesSearch && matchesCategory;
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case "price-low":
-          return a.listingPrice - b.listingPrice;
-        case "price-high":
-          return b.listingPrice - a.listingPrice;
-        case "newest":
-          return (
-            new Date(b.listedAt).getTime() - new Date(a.listedAt).getTime()
-          );
-        case "oldest":
-          return (
-            new Date(a.listedAt).getTime() - new Date(b.listedAt).getTime()
-          );
-        default:
-          return 0;
-      }
-    });
+  const queryClient = useQueryClient();
 
-  const handleBuyTicket = (listing: any) => {
+  // Fetch marketplace listings
+  const {
+    data: listingsResponse,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["marketplace-listings", searchQuery, categoryFilter, sortBy],
+    queryFn: () => {
+      const params: MarketplaceQueryDto = {
+        search: searchQuery || undefined,
+        category: categoryFilter === "all" ? undefined : categoryFilter,
+        sortBy: sortBy as any,
+        limit: 50,
+      };
+      return marketplaceApi.getListings(params);
+    },
+    staleTime: 1000 * 30, // 30 seconds
+  });
+
+  console.log(listingsResponse);
+
+  // Fetch marketplace stats
+  const { data: statsResponse } = useQuery({
+    queryKey: ["marketplace-stats"],
+    queryFn: () => marketplaceApi.getStats(),
+    staleTime: 1000 * 60, // 1 minute
+  });
+
+  // Buy listing mutation
+  const buyListingMutation = useMutation({
+    mutationFn: ({
+      listingId,
+      buyerData,
+    }: {
+      listingId: string;
+      buyerData: BuyListingDto;
+    }) => marketplaceApi.buyListing(listingId, buyerData),
+    onSuccess: () => {
+      notifications.show({
+        title: "🎉 Purchase Successful!",
+        message: `You've successfully purchased the ticket!`,
+        color: "green",
+        autoClose: 5000,
+      });
+      closeBuyModal();
+      queryClient.invalidateQueries({ queryKey: ["marketplace-listings"] });
+      queryClient.invalidateQueries({ queryKey: ["marketplace-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["my-tickets"] });
+    },
+    onError: (error: any) => {
+      notifications.show({
+        title: "❌ Purchase Failed",
+        message: error.response?.data?.message || "Failed to purchase ticket",
+        color: "red",
+        autoClose: 5000,
+      });
+    },
+  });
+
+  const listings = listingsResponse?.data?.data || [];
+  const stats = statsResponse?.data;
+
+  const handleBuyTicket = (listing: MarketplaceListing) => {
+    if (!address) {
+      notifications.show({
+        title: "⚠️ Wallet Required",
+        message: "Please connect your wallet to purchase tickets",
+        color: "orange",
+        autoClose: 3000,
+      });
+      return;
+    }
     setSelectedListing(listing);
     openBuyModal();
   };
 
   const confirmPurchase = () => {
-    notifications.show({
-      title: "🎉 Purchase Successful!",
-      message: `You've bought ${selectedListing?.event.name} for SUI ${selectedListing?.listingPrice}`,
-      color: "green",
-      autoClose: 5000,
+    if (!selectedListing || !address) return;
+
+    const buyerData: BuyListingDto = {
+      buyerAddress: address,
+      // In a real implementation, this would come from the blockchain transaction
+      transactionHash: `mock_tx_${Date.now()}`,
+    };
+
+    buyListingMutation.mutate({
+      listingId: selectedListing.id,
+      buyerData,
     });
-    closeBuyModal();
   };
 
   if (!isConnected) {
@@ -314,20 +319,19 @@ export const MarketplacePage = () => {
               {/* Stats */}
               <Group justify="space-between">
                 <Text size="lg" fw={600} c="dark">
-                  {filteredListings.length} NFT Tickets Available
+                  {listings.length} NFT Tickets Available
                 </Text>
                 <Group gap="lg">
                   <Group gap="xs">
                     <IconTrendingUp size={16} color="#22c55e" />
                     <Text size="sm" c="dimmed">
-                      24h Volume: SUI 1,250
+                      24h Volume: SUI {stats?.totalVolume || "Loading..."}
                     </Text>
                   </Group>
                   <Group gap="xs">
                     <IconFlame size={16} color="#ef4444" />
                     <Text size="sm" c="dimmed">
-                      {mockMarketplaceListings.filter((l) => l.isHot).length}{" "}
-                      Hot Listings
+                      {stats?.hotListings || "Loading..."} Hot Listings
                     </Text>
                   </Group>
                 </Group>
@@ -346,7 +350,7 @@ export const MarketplacePage = () => {
               border: "1px solid rgba(255, 255, 255, 0.2)",
             }}
           >
-            {filteredListings.length === 0 ? (
+            {listings.length === 0 ? (
               <Center py="xl">
                 <Stack align="center" gap="md" ta="center">
                   <ThemeIcon
@@ -367,7 +371,7 @@ export const MarketplacePage = () => {
               </Center>
             ) : (
               <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
-                {filteredListings.map((listing) => (
+                {listings.map((listing) => (
                   <MarketplaceListingCard
                     key={listing.id}
                     listing={listing}
@@ -409,18 +413,24 @@ export const MarketplacePage = () => {
             >
               <Stack gap="sm">
                 <Text fw={600} size="lg">
-                  {selectedListing.event.name}
+                  {selectedListing.ticket?.event?.name || "Event Name"}
                 </Text>
                 <Group gap="md">
                   <Group gap="xs">
                     <IconCalendar size={16} />
                     <Text size="sm">
-                      {dayjs(selectedListing.event.date).format("MMM DD, YYYY")}
+                      {selectedListing.ticket?.event?.date
+                        ? dayjs(selectedListing.ticket.event.date).format(
+                            "MMM DD, YYYY"
+                          )
+                        : "TBD"}
                     </Text>
                   </Group>
                   <Group gap="xs">
                     <IconMapPin size={16} />
-                    <Text size="sm">{selectedListing.event.location}</Text>
+                    <Text size="sm">
+                      {selectedListing.ticket?.event?.location || "TBD"}
+                    </Text>
                   </Group>
                 </Group>
                 <Group justify="space-between" align="center">
@@ -428,7 +438,7 @@ export const MarketplacePage = () => {
                     SUI {selectedListing.listingPrice}
                   </Text>
                   <Badge variant="light" color="gray">
-                    Seller: {selectedListing.seller.slice(0, 8)}...
+                    Seller: {selectedListing.sellerAddress.slice(0, 8)}...
                   </Badge>
                 </Group>
               </Stack>
@@ -453,7 +463,13 @@ export const MarketplacePage = () => {
 };
 
 // Marketplace Listing Card Component
-const MarketplaceListingCard = ({ listing, onBuy }: any) => {
+const MarketplaceListingCard = ({
+  listing,
+  onBuy,
+}: {
+  listing: MarketplaceListing;
+  onBuy: () => void;
+}) => {
   return (
     <Transition mounted={true} transition="slide-up" duration={400}>
       {(styles) => (
@@ -505,20 +521,22 @@ const MarketplaceListingCard = ({ listing, onBuy }: any) => {
                 fw={700}
                 style={{ textShadow: "0 2px 4px rgba(0,0,0,0.3)" }}
               >
-                {listing.event.name}
+                {listing.ticket?.event?.name || "Event Name"}
               </Text>
 
               <Group gap="md">
                 <Group gap="xs">
                   <IconCalendar size={14} style={{ opacity: 0.9 }} />
                   <Text size="xs" style={{ opacity: 0.9 }}>
-                    {dayjs(listing.event.date).format("MMM DD")}
+                    {listing.ticket?.event?.date
+                      ? dayjs(listing.ticket.event.date).format("MMM DD")
+                      : "TBD"}
                   </Text>
                 </Group>
                 <Group gap="xs">
                   <IconMapPin size={14} style={{ opacity: 0.9 }} />
                   <Text size="xs" style={{ opacity: 0.9 }}>
-                    {listing.event.location}
+                    {listing.ticket?.event?.location || "TBD"}
                   </Text>
                 </Group>
               </Group>
@@ -540,7 +558,7 @@ const MarketplaceListingCard = ({ listing, onBuy }: any) => {
                   color="white"
                   style={{ backgroundColor: "rgba(255,255,255,0.2)" }}
                 >
-                  {listing.category}
+                  {listing.category || "Other"}
                 </Badge>
               </Group>
             </Stack>
@@ -557,7 +575,7 @@ const MarketplaceListingCard = ({ listing, onBuy }: any) => {
             <Group justify="space-between" align="center">
               <Group gap="xs">
                 <Text size="xs" style={{ opacity: 0.8 }}>
-                  Listed {dayjs(listing.listedAt).fromNow()}
+                  Listed {dayjs(listing.createdAt).fromNow()}
                 </Text>
               </Group>
               <Button

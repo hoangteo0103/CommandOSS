@@ -1,0 +1,777 @@
+[
+  {
+    "name": "Web3 Music Festival Tokyo",
+    "description": "Where AI and decentralized systems meet – research meets engineering.",
+    "location": "Shibuya Crossing",
+    "latitude": 35.659487,
+    "longitude": 139.700044,
+    "placeId": "ChIJD9ZyQdWLGGARFZlFjAs2nGQ",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-07-05T05:01:34.716287",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,0",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,0",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_0",
+        "name": "General Admission",
+        "price": 3,
+        "supply": 100,
+        "availableSupply": 100,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_0",
+        "name": "VIP Access",
+        "price": 8,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "Tech for Good Summit Ho Chi Minh City",
+    "description": "An immersive experience into the world of decentralized technology and entertainment.",
+    "location": "Saigon Opera House",
+    "latitude": 10.776889,
+    "longitude": 106.703443,
+    "placeId": "ChIJrWnj8KQuNTER0cG5v1dQyUQ",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-06-13T05:01:34.716322",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,1",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,1",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_1",
+        "name": "General Admission",
+        "price": 3,
+        "supply": 101,
+        "availableSupply": 101,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_1",
+        "name": "VIP Access",
+        "price": 9,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "Startup Pitch Day London",
+    "description": "Live demos, product pitches, and networking with Web3 investors and founders.",
+    "location": "The O2 Arena",
+    "latitude": 51.503038,
+    "longitude": 0.003154,
+    "placeId": "ChIJ0T6x5gUEdkgRmmzM4HTnCdI",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-07-25T05:01:34.716340",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,2",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,2",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_2",
+        "name": "General Admission",
+        "price": 5,
+        "supply": 102,
+        "availableSupply": 102,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_2",
+        "name": "VIP Access",
+        "price": 8,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "NFT Art Expo London",
+    "description": "Form teams, write code, and build the next breakthrough dApps in 48 hours.",
+    "location": "The O2 Arena",
+    "latitude": 51.503038,
+    "longitude": 0.003154,
+    "placeId": "ChIJ0T6x5gUEdkgRmmzM4HTnCdI",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-07-20T05:01:34.716356",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,3",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,3",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_3",
+        "name": "General Admission",
+        "price": 3,
+        "supply": 103,
+        "availableSupply": 103,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_3",
+        "name": "VIP Access",
+        "price": 8,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "Global Crypto Hackathon San Francisco",
+    "description": "Debate and design the next generation of decentralized finance tools.",
+    "location": "Golden Gate Park",
+    "latitude": 37.769421,
+    "longitude": -122.486214,
+    "placeId": "ChIJOwg_06VPwokRYv534QaPC8g",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-07-07T05:01:34.716366",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,4",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,4",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_4",
+        "name": "General Admission",
+        "price": 3,
+        "supply": 104,
+        "availableSupply": 104,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_4",
+        "name": "VIP Access",
+        "price": 7,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "Blockchain Gaming Con Berlin",
+    "description": "Form teams, write code, and build the next breakthrough dApps in 48 hours.",
+    "location": "Brandenburg Gate",
+    "latitude": 52.516275,
+    "longitude": 13.377704,
+    "placeId": "ChIJAVkDPzdOqEcRcDteW0YgIQQ",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-07-07T05:01:34.716374",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,5",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,5",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_5",
+        "name": "General Admission",
+        "price": 4,
+        "supply": 105,
+        "availableSupply": 105,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_5",
+        "name": "VIP Access",
+        "price": 7,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "DeFi Future Forum London",
+    "description": "Live demos, product pitches, and networking with Web3 investors and founders.",
+    "location": "The O2 Arena",
+    "latitude": 51.503038,
+    "longitude": 0.003154,
+    "placeId": "ChIJ0T6x5gUEdkgRmmzM4HTnCdI",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-07-11T05:01:34.716382",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,6",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,6",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_6",
+        "name": "General Admission",
+        "price": 5,
+        "supply": 106,
+        "availableSupply": 106,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_6",
+        "name": "VIP Access",
+        "price": 8,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "AI x Web3 Conference Tokyo",
+    "description": "Live demos, product pitches, and networking with Web3 investors and founders.",
+    "location": "Shibuya Crossing",
+    "latitude": 35.659487,
+    "longitude": 139.700044,
+    "placeId": "ChIJD9ZyQdWLGGARFZlFjAs2nGQ",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-06-30T05:01:34.716406",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,7",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,7",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_7",
+        "name": "General Admission",
+        "price": 5,
+        "supply": 107,
+        "availableSupply": 107,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_7",
+        "name": "VIP Access",
+        "price": 8,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "Metaverse Meetup Paris",
+    "description": "Debate and design the next generation of decentralized finance tools.",
+    "location": "Eiffel Tower",
+    "latitude": 48.85837,
+    "longitude": 2.294481,
+    "placeId": "ChIJA3B6P1M9wkcRj85ZX8H8OAU",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-07-21T05:01:34.716415",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,8",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,8",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_8",
+        "name": "General Admission",
+        "price": 4,
+        "supply": 108,
+        "availableSupply": 108,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_8",
+        "name": "VIP Access",
+        "price": 8,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "Open Source Builders Day London",
+    "description": "Debate and design the next generation of decentralized finance tools.",
+    "location": "The O2 Arena",
+    "latitude": 51.503038,
+    "longitude": 0.003154,
+    "placeId": "ChIJ0T6x5gUEdkgRmmzM4HTnCdI",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-06-13T05:01:34.716423",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,9",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,9",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_9",
+        "name": "General Admission",
+        "price": 5,
+        "supply": 109,
+        "availableSupply": 109,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_9",
+        "name": "VIP Access",
+        "price": 9,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "DAO Governance Roundtable New York",
+    "description": "Where AI and decentralized systems meet – research meets engineering.",
+    "location": "Times Square",
+    "latitude": 40.758896,
+    "longitude": -73.98513,
+    "placeId": "ChIJDbdkHFQayUwR7-8fITgxTmU",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-07-23T05:01:34.716431",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,10",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,10",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_10",
+        "name": "General Admission",
+        "price": 5,
+        "supply": 110,
+        "availableSupply": 110,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_10",
+        "name": "VIP Access",
+        "price": 8,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "Sui Developers Camp Ho Chi Minh City",
+    "description": "Meet top minds building the future of finance, identity, and open protocols.",
+    "location": "Saigon Opera House",
+    "latitude": 10.776889,
+    "longitude": 106.703443,
+    "placeId": "ChIJrWnj8KQuNTER0cG5v1dQyUQ",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-06-16T05:01:34.716439",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,11",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,11",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_11",
+        "name": "General Admission",
+        "price": 4,
+        "supply": 111,
+        "availableSupply": 111,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_11",
+        "name": "VIP Access",
+        "price": 7,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "Web3 Infra Days New York",
+    "description": "Where AI and decentralized systems meet – research meets engineering.",
+    "location": "Times Square",
+    "latitude": 40.758896,
+    "longitude": -73.98513,
+    "placeId": "ChIJDbdkHFQayUwR7-8fITgxTmU",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-07-25T05:01:34.716446",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,12",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,12",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_12",
+        "name": "General Admission",
+        "price": 3,
+        "supply": 112,
+        "availableSupply": 112,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_12",
+        "name": "VIP Access",
+        "price": 9,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "Global Tokenomics Summit London",
+    "description": "An immersive experience into the world of decentralized technology and entertainment.",
+    "location": "The O2 Arena",
+    "latitude": 51.503038,
+    "longitude": 0.003154,
+    "placeId": "ChIJ0T6x5gUEdkgRmmzM4HTnCdI",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-07-17T05:01:34.716465",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,13",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,13",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_13",
+        "name": "General Admission",
+        "price": 4,
+        "supply": 113,
+        "availableSupply": 113,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_13",
+        "name": "VIP Access",
+        "price": 7,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "Sustainable Blockchain Week Singapore",
+    "description": "Live demos, product pitches, and networking with Web3 investors and founders.",
+    "location": "Marina Bay Sands",
+    "latitude": 1.2834,
+    "longitude": 103.8607,
+    "placeId": "ChIJ7fRzY_QZ2jERoH5dmyYVa-0",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-06-26T05:01:34.716475",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,14",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,14",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_14",
+        "name": "General Admission",
+        "price": 3,
+        "supply": 114,
+        "availableSupply": 114,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_14",
+        "name": "VIP Access",
+        "price": 8,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "Virtual Concert Series Tokyo",
+    "description": "Play and build blockchain-based games with devs around the world.",
+    "location": "Shibuya Crossing",
+    "latitude": 35.659487,
+    "longitude": 139.700044,
+    "placeId": "ChIJD9ZyQdWLGGARFZlFjAs2nGQ",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-07-13T05:01:34.716482",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,15",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,15",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_15",
+        "name": "General Admission",
+        "price": 4,
+        "supply": 115,
+        "availableSupply": 115,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_15",
+        "name": "VIP Access",
+        "price": 7,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "Interactive NFT Gallery Tokyo",
+    "description": "Where AI and decentralized systems meet – research meets engineering.",
+    "location": "Shibuya Crossing",
+    "latitude": 35.659487,
+    "longitude": 139.700044,
+    "placeId": "ChIJD9ZyQdWLGGARFZlFjAs2nGQ",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-07-17T05:01:34.716489",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,16",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,16",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_16",
+        "name": "General Admission",
+        "price": 3,
+        "supply": 116,
+        "availableSupply": 116,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_16",
+        "name": "VIP Access",
+        "price": 7,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "Cross-Chain Convergence Ho Chi Minh City",
+    "description": "Meet top minds building the future of finance, identity, and open protocols.",
+    "location": "Saigon Opera House",
+    "latitude": 10.776889,
+    "longitude": 106.703443,
+    "placeId": "ChIJrWnj8KQuNTER0cG5v1dQyUQ",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-07-23T05:01:34.716496",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,17",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,17",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_17",
+        "name": "General Admission",
+        "price": 4,
+        "supply": 117,
+        "availableSupply": 117,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_17",
+        "name": "VIP Access",
+        "price": 8,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "Sui World Tour New York",
+    "description": "Debate and design the next generation of decentralized finance tools.",
+    "location": "Times Square",
+    "latitude": 40.758896,
+    "longitude": -73.98513,
+    "placeId": "ChIJDbdkHFQayUwR7-8fITgxTmU",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-06-21T05:01:34.716506",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,18",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,18",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_18",
+        "name": "General Admission",
+        "price": 5,
+        "supply": 118,
+        "availableSupply": 118,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_18",
+        "name": "VIP Access",
+        "price": 7,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "Layer1 Tech Fest Tokyo",
+    "description": "Live demos, product pitches, and networking with Web3 investors and founders.",
+    "location": "Shibuya Crossing",
+    "latitude": 35.659487,
+    "longitude": 139.700044,
+    "placeId": "ChIJD9ZyQdWLGGARFZlFjAs2nGQ",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-07-25T05:01:34.716527",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,19",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,19",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_19",
+        "name": "General Admission",
+        "price": 3,
+        "supply": 119,
+        "availableSupply": 119,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_19",
+        "name": "VIP Access",
+        "price": 7,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "On-Chain Music Awards San Francisco",
+    "description": "Explore stunning digital art powered by NFTs on-chain.",
+    "location": "Golden Gate Park",
+    "latitude": 37.769421,
+    "longitude": -122.486214,
+    "placeId": "ChIJOwg_06VPwokRYv534QaPC8g",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-07-05T05:01:34.716534",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,20",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,20",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_20",
+        "name": "General Admission",
+        "price": 5,
+        "supply": 120,
+        "availableSupply": 120,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_20",
+        "name": "VIP Access",
+        "price": 7,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "ZK Night Live San Francisco",
+    "description": "Explore stunning digital art powered by NFTs on-chain.",
+    "location": "Golden Gate Park",
+    "latitude": 37.769421,
+    "longitude": -122.486214,
+    "placeId": "ChIJOwg_06VPwokRYv534QaPC8g",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-07-05T05:01:34.716541",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,21",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,21",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_21",
+        "name": "General Admission",
+        "price": 4,
+        "supply": 121,
+        "availableSupply": 121,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_21",
+        "name": "VIP Access",
+        "price": 8,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "Wallet UX Jam Tokyo",
+    "description": "Play and build blockchain-based games with devs around the world.",
+    "location": "Shibuya Crossing",
+    "latitude": 35.659487,
+    "longitude": 139.700044,
+    "placeId": "ChIJD9ZyQdWLGGARFZlFjAs2nGQ",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-06-03T05:01:34.716553",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,22",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,22",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_22",
+        "name": "General Admission",
+        "price": 3,
+        "supply": 122,
+        "availableSupply": 122,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_22",
+        "name": "VIP Access",
+        "price": 7,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "Sui Real-World Asset Expo Berlin",
+    "description": "Form teams, write code, and build the next breakthrough dApps in 48 hours.",
+    "location": "Brandenburg Gate",
+    "latitude": 52.516275,
+    "longitude": 13.377704,
+    "placeId": "ChIJAVkDPzdOqEcRcDteW0YgIQQ",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-07-14T05:01:34.716561",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,23",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,23",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_23",
+        "name": "General Admission",
+        "price": 5,
+        "supply": 123,
+        "availableSupply": 123,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_23",
+        "name": "VIP Access",
+        "price": 9,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  },
+  {
+    "name": "Web3 Music Festival New York",
+    "description": "Form teams, write code, and build the next breakthrough dApps in 48 hours.",
+    "location": "Times Square",
+    "latitude": 40.758896,
+    "longitude": -73.98513,
+    "placeId": "ChIJDbdkHFQayUwR7-8fITgxTmU",
+    "organizerName": "Global Web3 Events",
+    "date": "2025-06-30T05:01:34.716568",
+    "logoUrl": "https://source.unsplash.com/300x300/?web3,event,token,24",
+    "bannerUrl": "https://source.unsplash.com/1200x400/?conference,blockchain,24",
+    "categories": ["Tech", "Web3"],
+    "ticketTypes": [
+      {
+        "id": "general_24",
+        "name": "General Admission",
+        "price": 3,
+        "supply": 124,
+        "availableSupply": 124,
+        "description": "Standard entry to the event"
+      },
+      {
+        "id": "vip_24",
+        "name": "VIP Access",
+        "price": 7,
+        "supply": 50,
+        "availableSupply": 50,
+        "description": "Front-row access and VIP lounge"
+      }
+    ]
+  }
+]

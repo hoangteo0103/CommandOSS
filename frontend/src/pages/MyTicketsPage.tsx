@@ -37,7 +37,6 @@ import {
   IconClock,
   IconCheck,
   IconX,
-  IconEye,
   IconShare,
   IconDownload,
   IconQrcode,

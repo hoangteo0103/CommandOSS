@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Grid,
   Box,
@@ -77,6 +77,7 @@ const mapOptions = {
 };
 
 const SearchPageContent = () => {
+  const navigate = useNavigate();
   const queryParam = useQueryParam("q") || "";
   const categoryParam = useQueryParam("categories");
 
@@ -816,10 +817,7 @@ const SearchPageContent = () => {
                             size="sm"
                             variant="filled"
                             onClick={() =>
-                              window.open(
-                                `/events/${selectedEvent.id}`,
-                                "_blank"
-                              )
+                              navigate(`/events/${selectedEvent.id}`)
                             }
                             style={{
                               flex: 1,
@@ -838,10 +836,7 @@ const SearchPageContent = () => {
                                 variant="light"
                                 color="green"
                                 onClick={() =>
-                                  window.open(
-                                    `/events/${selectedEvent.id}`,
-                                    "_blank"
-                                  )
+                                  navigate(`/events/${selectedEvent.id}`)
                                 }
                                 style={{ fontWeight: 600 }}
                               >

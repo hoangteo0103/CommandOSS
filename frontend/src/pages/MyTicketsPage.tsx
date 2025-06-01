@@ -25,7 +25,6 @@ import {
   Divider,
   Timeline,
   Modal,
-  NumberFormatter,
   CopyButton,
   TextInput,
   NumberInput,
@@ -71,7 +70,7 @@ import type { CreateListingDto } from "../services/marketplace";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const MyTicketsPage = () => {
-  const { isConnected, address } = useWallet();
+  const { isConnected, address, signAndExecuteTransaction } = useWallet();
   const [activeTab, setActiveTab] = useState<string | null>("all");
   const [selectedTicket, setSelectedTicket] = useState<any>(null);
   const [
@@ -138,7 +137,7 @@ export const MyTicketsPage = () => {
     (t) => t.event && new Date(t.event.date) <= new Date()
   ).length;
   const usedCount = tickets.filter((t) => t.isUsed).length;
-  const totalValue = tickets.reduce(
+  const totalValue = (tickets || []).reduce(
     (sum, ticket) => sum + (ticket?.price || 0),
     0
   );
@@ -172,20 +171,105 @@ export const MyTicketsPage = () => {
     openSellModal();
   };
 
-  const handleCreateListing = () => {
+  const handleCreateListing = async () => {
     if (!ticketToSell || !address) return;
 
-    const listingData: CreateListingDto = {
-      ticketId: ticketToSell.id,
-      sellerAddress: address,
-      listingPrice: parseFloat(sellForm.listingPrice),
-      originalPrice: ticketToSell.price || 0,
-      category: sellForm.category || undefined,
-      description: sellForm.description || undefined,
-      expiresAt: sellForm.expiresAt || undefined,
-    };
+    try {
+      // Step 1: Get escrow address
+      notifications.show({
+        id: "listing-process",
+        title: "🔒 Preparing Escrow",
+        message: "Getting secure escrow address...",
+        color: "blue",
+        autoClose: false,
+        loading: true,
+      });
 
-    createListingMutation.mutate(listingData);
+      const escrowResponse = await marketplaceApi.getEscrowAddress();
+      console.log("Escrow API response", escrowResponse);
+      const backendWalletAddress = escrowResponse.data?.data.escrowAddress;
+
+      // Check if escrow address is defined
+      if (!backendWalletAddress) {
+        console.error("Escrow address is undefined");
+        throw new Error(
+          "Escrow address is not available. Failed to transfer NFT to escrow."
+        );
+      }
+
+      // Step 2: Transfer NFT to escrow (backend wallet)
+      notifications.update({
+        id: "listing-process",
+        title: "🔒 Transferring to Escrow",
+        message: "Please approve the NFT transfer to our secure escrow...",
+        color: "blue",
+        autoClose: false,
+        loading: true,
+      });
+
+      // Create transaction to transfer NFT to backend escrow
+      const { Transaction } = await import("@mysten/sui/transactions");
+      const transaction = new Transaction();
+
+      // Transfer the NFT to escrow
+      if (!transaction.pure || typeof transaction.pure.address !== "function") {
+        console.error(
+          "transaction.pure or address method is undefined",
+          transaction.pure
+        );
+        throw new Error(
+          "Transaction object is not properly initialized: pure or address method missing"
+        );
+      }
+      transaction.transferObjects(
+        [transaction.object(ticketToSell.nftTokenId)],
+        transaction.pure.address(backendWalletAddress)
+      );
+
+      const escrowResult = await signAndExecuteTransaction(transaction).catch(
+        (error) => {
+          console.error("Transaction failed:", error);
+          throw new Error(`Transaction failed: ${error.message || error}`);
+        }
+      );
+
+      notifications.update({
+        id: "listing-process",
+        title: "📝 Creating Listing",
+        message: "NFT secured in escrow, creating marketplace listing...",
+        color: "blue",
+        autoClose: false,
+        loading: true,
+      });
+
+      // Step 3: Create listing with escrow transaction hash
+      const listingData: CreateListingDto = {
+        ticketId: ticketToSell.id,
+        sellerAddress: address,
+        listingPrice: parseFloat(sellForm.listingPrice),
+        originalPrice: ticketToSell.price || 0,
+        category: sellForm.category || undefined,
+        description: sellForm.description || undefined,
+        expiresAt: sellForm.expiresAt || undefined,
+        transactionHash: escrowResult.digest, // Escrow transaction hash
+      };
+
+      console.log("listingData", listingData);
+
+      await createListingMutation.mutateAsync(listingData);
+
+      notifications.hide("listing-process");
+    } catch (error: any) {
+      notifications.hide("listing-process");
+
+      console.error("Listing error full stack:", error);
+      notifications.show({
+        title: "❌ Listing Failed",
+        message: error.message || "Failed to create listing",
+        color: "red",
+        autoClose: 5000,
+      });
+    }
   };
 
   // Create listing mutation
@@ -194,7 +278,8 @@ export const MyTicketsPage = () => {
     onSuccess: () => {
       notifications.show({
         title: "🎉 Listed Successfully!",
-        message: "Your ticket is now available in the marketplace",
+        message:
+          "Your ticket has been transferred to escrow and is now available in the marketplace",
         color: "green",
         autoClose: 5000,
       });
@@ -546,11 +631,7 @@ export const MyTicketsPage = () => {
                           Total Value
                         </Text>
                         <Text size="xl" fw={700}>
-                          <NumberFormatter
-                            value={totalValue}
-                            prefix="$"
-                            thousandSeparator
-                          />
+                          SUI {totalValue}
                         </Text>
                       </div>
                       <ThemeIcon
@@ -911,6 +992,19 @@ export const MyTicketsPage = () => {
       >
         {ticketToSell && (
           <Stack gap="lg">
+            {/* Escrow Notice */}
+            <Alert color="blue" variant="light" radius="lg">
+              <Text size="sm" fw={500} mb="xs">
+                🔒 Secure Escrow Process
+              </Text>
+              <Text size="sm">
+                When you list your ticket, it will be transferred to our secure
+                escrow system. You'll need to approve this transaction in your
+                wallet. If your listing is cancelled or expires, the ticket will
+                be automatically returned to you.
+              </Text>
+            </Alert>
+
             {/* Ticket Info */}
             <Card
               p="lg"
@@ -1063,7 +1157,7 @@ const TicketCard = ({ ticket, onView, onShare, onSell }: any) => {
           margin: 1,
           color: {
             dark: "#ffffff",
-            light: "transparent",
+            light: "#000000",
           },
         });
         setMiniQrCode(qrCodeUrl);

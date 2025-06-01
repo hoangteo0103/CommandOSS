@@ -44,9 +44,9 @@ import { marketplaceApi } from "../services/marketplace";
 import type {
   MarketplaceListing,
   MarketplaceQueryDto,
-  BuyListingDto,
 } from "../services/marketplace";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMarketplacePurchase } from "../hooks/useMarketplacePurchase";
 
 dayjs.extend(relativeTime);
 
@@ -61,6 +61,7 @@ export const MarketplacePage = () => {
     useDisclosure(false);
 
   const queryClient = useQueryClient();
+  const { purchaseTicket, isProcessing } = useMarketplacePurchase();
 
   // Fetch marketplace listings
   const {
@@ -91,37 +92,6 @@ export const MarketplacePage = () => {
     staleTime: 1000 * 60, // 1 minute
   });
 
-  // Buy listing mutation
-  const buyListingMutation = useMutation({
-    mutationFn: ({
-      listingId,
-      buyerData,
-    }: {
-      listingId: string;
-      buyerData: BuyListingDto;
-    }) => marketplaceApi.buyListing(listingId, buyerData),
-    onSuccess: () => {
-      notifications.show({
-        title: "🎉 Purchase Successful!",
-        message: `You've successfully purchased the ticket!`,
-        color: "green",
-        autoClose: 5000,
-      });
-      closeBuyModal();
-      queryClient.invalidateQueries({ queryKey: ["marketplace-listings"] });
-      queryClient.invalidateQueries({ queryKey: ["marketplace-stats"] });
-      queryClient.invalidateQueries({ queryKey: ["my-tickets"] });
-    },
-    onError: (error: any) => {
-      notifications.show({
-        title: "❌ Purchase Failed",
-        message: error.response?.data?.message || "Failed to purchase ticket",
-        color: "red",
-        autoClose: 5000,
-      });
-    },
-  });
-
   const listings = listingsResponse?.data?.data || [];
   const stats = statsResponse?.data;
 
@@ -139,19 +109,22 @@ export const MarketplacePage = () => {
     openBuyModal();
   };
 
-  const confirmPurchase = () => {
-    if (!selectedListing || !address) return;
+  const confirmPurchase = async () => {
+    if (!selectedListing) return;
 
-    const buyerData: BuyListingDto = {
-      buyerAddress: address,
-      // In a real implementation, this would come from the blockchain transaction
-      transactionHash: `mock_tx_${Date.now()}`,
-    };
+    try {
+      await purchaseTicket(selectedListing);
 
-    buyListingMutation.mutate({
-      listingId: selectedListing.id,
-      buyerData,
-    });
+      // Refresh data after successful purchase
+      queryClient.invalidateQueries({ queryKey: ["marketplace-listings"] });
+      queryClient.invalidateQueries({ queryKey: ["marketplace-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["my-tickets"] });
+
+      closeBuyModal();
+    } catch (error) {
+      // Error is already handled in the hook
+      console.error("Purchase failed:", error);
+    }
   };
 
   if (!isConnected) {
@@ -451,8 +424,10 @@ export const MarketplacePage = () => {
                 variant="gradient"
                 gradient={{ from: "orange", to: "red", deg: 45 }}
                 onClick={confirmPurchase}
+                loading={isProcessing}
+                disabled={isProcessing}
               >
-                Confirm Purchase
+                {isProcessing ? "Processing..." : "Confirm Purchase"}
               </Button>
             </Group>
           </Stack>

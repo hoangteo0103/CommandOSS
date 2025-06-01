@@ -270,13 +270,6 @@ export const TicketPurchasePage = () => {
         autoClose: 5000,
       });
 
-      // Log the purchase notification being sent to backend
-      console.log("🚀 SENDING PURCHASE NOTIFICATION TO BACKEND:");
-      console.log("📦 Order ID:", reservation.id);
-      console.log("🔐 Payment Signature:", result.signature || result.digest);
-      console.log("💰 Transaction Digest:", result.digest);
-      console.log("⏰ Timestamp:", new Date().toISOString());
-
       // Now complete the purchase with the real transaction signature
       purchaseMutation.mutate({
         orderId: reservation.id,

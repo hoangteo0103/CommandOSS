@@ -63,7 +63,7 @@ export interface MarketplaceQueryDto {
 
 export interface BuyListingDto {
   buyerAddress: string;
-  transactionHash?: string;
+  transactionHash: string;
 }
 
 export interface MarketplaceStats {
@@ -120,5 +120,10 @@ export const marketplaceApi = {
   // Get available categories
   getCategories: async () => {
     return api.get("/marketplace/categories");
+  },
+
+  // Get escrow address
+  getEscrowAddress: async (): Promise<{ data: any }> => {
+    return api.get("/marketplace/escrow-address");
   },
 };

@@ -67,35 +67,6 @@ A decentralized marketplace for buying and selling NFT event tickets built on th
 - **Qdrant Vector DB** for semantic search and AI features
 - **Geographic Indexing** for location-based queries
 
-### Component Overview
-
-The NFT Ticket Marketplace follows a modern, microservices-inspired architecture with clear separation of concerns:
-
-#### Frontend Layer
-
-- **React Application**: User interface with wallet integration and real-time updates
-- **Map Interface**: Interactive geographic event discovery
-- **Wallet Connector**: Sui blockchain wallet integration
-
-#### Backend Services
-
-- **API Gateway**: RESTful API endpoints for all client interactions
-- **Marketplace Service**: Core business logic for ticket listings and transactions
-- **Search Service**: Integration with Qdrant for semantic and geographic search
-- **Blockchain Service**: Sui network interaction and NFT management
-
-#### Data Layer
-
-- **PostgreSQL**: Primary database for user data, events, and marketplace listings
-- **Qdrant Vector DB**: Vector embeddings for semantic search and recommendations
-- **Sui Blockchain**: Immutable NFT storage and transaction records
-
-#### External Services
-
-- **Sui Network**: Blockchain infrastructure for NFT minting and transfers
-- **Escrow Smart Contracts**: Automated transaction security
-- **Geolocation APIs**: Location-based search and mapping
-
 ### Data Flow
 
 1. **Event Discovery**: Users search through semantic queries or map interface
@@ -158,7 +129,7 @@ The NFT Ticket Marketplace follows a modern, microservices-inspired architecture
 
 1. **Browse Events**: Explore events through list view or interactive map
 2. **Semantic Search**: Use natural language to find events (e.g., "jazz concerts near downtown")
-3. **Location-Based**: Filter events by geographic proximity
+3. **Location-Based**: Filter events by geographic map 
 4. **Smart Filters**: Apply multiple criteria for precise results
 
 ### For Buyers
@@ -174,28 +145,6 @@ The NFT Ticket Marketplace follows a modern, microservices-inspired architecture
 2. **Escrow Transfer**: NFTs are automatically moved to secure escrow
 3. **Set Pricing**: Configure listing price and optional details
 4. **Automatic Settlement**: Receive payment when ticket is sold
-
-## 🏗️ Project Structure
-
-```
-CommandOSS/
-├── frontend/                 # React frontend application
-│   ├── src/
-│   │   ├── components/      # Reusable UI components
-│   │   ├── hooks/          # Custom React hooks
-│   │   ├── pages/          # Page components
-│   │   ├── services/       # API services
-│   │   └── types/          # TypeScript type definitions
-│   └── package.json
-├── backend/                 # NestJS backend application
-│   ├── src/
-│   │   ├── entities/       # Database entities
-│   │   ├── modules/        # Feature modules
-│   │   ├── services/       # Business logic services
-│   │   └── controllers/    # API controllers
-│   └── package.json
-└── README.md
-```
 
 ## 🔧 Environment Configuration
 

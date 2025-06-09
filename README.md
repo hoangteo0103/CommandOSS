@@ -1,6 +1,6 @@
-# 🎫 NFT Ticket Marketplace
+# 🎫 NFT Ticket System
 
-A decentralized marketplace for buying and selling NFT event tickets built on the Sui blockchain. This platform enables secure peer-to-peer transactions for premium event experiences through blockchain-verified digital tickets.
+A decentralized ticket system for organizing events and for buying and selling NFT event tickets built on the Sui blockchain. This platform enables secure peer-to-peer transactions for premium event experiences through blockchain-verified digital tickets.
 
 Now lived on https://eventify-five-wheat.vercel.app/
 ## 🏗️ System Architecture
